@@ -1,0 +1,97 @@
+
+
+#pragma once
+
+namespace atl
+{
+    /*
+     clamp
+     Clamp value to the range [targetMin, targetMax]
+     */
+    template <class T>
+    constexpr T clamp(T value, T targetMin, T targetMax)
+    {
+        return value < targetMin ? targetMin : (value > targetMax ? targetMax : value);
+    }
+    
+    /*
+     mapf
+     Generate an interpolation factor from [0, 1] using value, originMin, and originMax.
+     Then interpolate from targetMin to targetMax using that value.
+     Standard precision floating point version.
+     */
+    constexpr float mapf(float value, float originMin, float originMax, float targetMin, float targetMax)
+    {
+        return value <= originMin ? targetMin :
+               value >= originMax ? targetMax : targetMin + (targetMax - targetMin) * ((value - originMin) / (originMax - originMin));
+    }
+
+    /*
+     mapd
+     Generate an interpolation factor from [0, 1] using value, originMin, and originMax.
+     Then interpolate from targetMin to targetMax using that value.
+     Double-precision floating point version.
+     */
+    constexpr double mapd(double value, double originMin, double originMax, double targetMin, double targetMax)
+    {
+        return value <= originMin ? targetMin :
+               value >= originMax ? targetMax : targetMin + (targetMax - targetMin) * ((value - originMin) / (originMax - originMin));
+    }
+
+    /*
+     mapf_unclamped
+     Generate an interpolation factor using value, originMin, and originMax.
+     Then interpolate from targetMin to targetMax using that value.
+     If value lies outside of originMin, originMax, the interpolation factor will not
+     lie within the range [0, 1], giving results outside of the range [targetMin, targetMax].
+     Standard precision floating point version.
+     */
+    constexpr float mapf_unclamped(float in_v, float originMin, float originMax, float targetMin, float targetMax)
+    {
+        return targetMin + (targetMax - targetMin) * ((in_v - originMin) / (originMax - originMin));
+    }
+
+    /*
+     mapd_unclamped
+     Generate an interpolation factor using value, originMin, and originMax.
+     Then interpolate from targetMin to targetMax using that value.
+     If value lies outside of originMin, originMax, the interpolation factor will not
+     lie within the range [0, 1], giving results outside of the range [targetMin, targetMax].
+     Double-precision floating point version.
+     */
+    constexpr double mapd_unclamped(double in_v, double originMin, double originMax, double targetMin, double targetMax)
+    {
+        return targetMin + (targetMax - targetMin) * ((in_v - originMin) / (originMax - originMin));
+    }
+    
+    /*
+     step_map
+     A simple step function.
+     Return ifBelow if value is less than about, otherwise return ifEqualToOrAbove.
+     */
+    template <class T>
+    constexpr T map_step(T value, T about, T ifBelow, T ifEqualToOrAbove)
+    {
+        return value < about ? ifBelow : ifEqualToOrAbove;
+    }
+    
+    /*
+     interpolateF
+     Interpolate between from and to using interpolation factor percent.
+     Standard precision floating point version.
+     */
+    constexpr float interpf(float from, float to, float percent)
+    {
+        return from * (1.f - percent) + to * percent;
+    }
+
+    /*
+     interpolateD
+     Interpolate between from and to using interpolation factor percent.
+     Double-precision floating point version.
+     */
+    constexpr double interpd(double from, double to, double percent)
+    {
+        return from * (1.0 - percent) + to * percent;
+    }
+}
