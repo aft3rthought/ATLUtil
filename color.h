@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ATLBasicMath.h"
+#include "basic_math.h"
 
 namespace atl
 {

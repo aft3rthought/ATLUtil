@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ATLBasicMath.h"
+#include "basic_math.h"
 #include <cmath>
 #include <algorithm>
 

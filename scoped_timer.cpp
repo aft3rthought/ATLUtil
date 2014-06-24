@@ -1,6 +1,6 @@
 
 
-#include "ATLScopedTimer.h"
+#include "scoped_timer.h"
 
 namespace atl
 {

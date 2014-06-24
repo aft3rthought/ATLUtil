@@ -1,6 +1,6 @@
 
 
-#include "ATLAnimationFunc.h"
+#include "animation_func.h"
 #include <cmath>
 
 float atl::ease_in_style1(const float in_val, const float in_bounce)

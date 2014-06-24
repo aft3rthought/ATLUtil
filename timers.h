@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "ATLArrayUtil.h"
-#include "ATLBasicMath.h"
+#include "array_util.h"
+#include "basic_math.h"
 #include <cmath>
 
 namespace atl
