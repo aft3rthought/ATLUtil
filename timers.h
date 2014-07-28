@@ -83,7 +83,7 @@ namespace atl
         template <typename T, size_t N>
         T & pick(T(&in_array)[N]) const
         {
-            return in_array[to_int(c_array_len(in_array))];
+            return in_array[to_int((int)c_array_len(in_array))];
         }
     };
     
@@ -162,7 +162,7 @@ namespace atl
         template <typename T, size_t N>
         T & pick(T(&in_array)[N]) const
         {
-            return in_array[to_int(c_array_len(in_array))];
+            return in_array[to_int((int)c_array_len(in_array))];
         }
     };
 }
