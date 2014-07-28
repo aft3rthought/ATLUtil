@@ -130,6 +130,12 @@ namespace atl
             y -= in_vec.y;
             return *this;
         }
+
+        point2f & operator - () {
+            x = -x;
+            y = -y;
+            return *this;
+        }
         
         vecLength length() const {
             return vecLength(x, y);
@@ -144,22 +150,22 @@ namespace atl
         float dot() const {
             return x * x + y * y;
         }
+
+        float dot(const point2f & in_other) const {
+            return x * in_other.x + y * in_other.y;
+        }
         
         point2f getNormal() const {
             float currentLength = length().getValue();
             return point2f(x / currentLength, y / currentLength);
         };
         
-        point2f getCrossToRight() const {
-            return point2f(y, -x);
-        };
-        
-        point2f getCrossToLeft() const {
+        point2f getCross() const {
             return point2f(-y, x);
         };
         
-        bool operator *= (const point2f & in_otherVector) {
-            return x != in_otherVector.x || y != in_otherVector.y;
+        bool operator *= (const point2f & in_other) {
+            return x != in_other.x || y != in_other.y;
         }
         
         point2f & operator *= (float in_scalar) {
