@@ -117,6 +117,27 @@ namespace atl
             return result;
         }
         
+        uint16_t read_uint16()
+        {
+            uint16_t result;
+            read_bytes((unsigned char *)&result, sizeof(uint16_t));
+            return result;
+        }
+        
+        uint32_t read_uint32()
+        {
+            uint32_t result;
+            read_bytes((unsigned char *)&result, sizeof(uint32_t));
+            return result;
+        }
+        
+        uint64_t read_uint64()
+        {
+            uint64_t result;
+            read_bytes((unsigned char *)&result, sizeof(uint64_t));
+            return result;
+        }
+        
         float read_float()
         {
             float result;
@@ -293,6 +314,21 @@ namespace atl
         void append_int64(int64_t in_value)
         {
             append_bytes((unsigned char *)&in_value, sizeof(int64_t));
+        }
+        
+        void append_uint16(uint16_t in_value)
+        {
+            append_bytes((unsigned char *)&in_value, sizeof(uint16_t));
+        }
+        
+        void append_uint32(uint32_t in_value)
+        {
+            append_bytes((unsigned char *)&in_value, sizeof(uint32_t));
+        }
+        
+        void append_uint64(uint64_t in_value)
+        {
+            append_bytes((unsigned char *)&in_value, sizeof(uint64_t));
         }
         
         void append_float(float in_value)
