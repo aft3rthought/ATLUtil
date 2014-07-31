@@ -2,28 +2,14 @@
 
 #pragma once
 
-#include <stddef.h>
+#include <vector>
+#include <algorithm>
 
 namespace atl
 {
     /*
-     arrayLength: Returns the length of a C-style array
+     * value_in_vector: Return true if value is in vector. Passes value by value, and compares using ==, so ideal for numeric types.
      */
-    template <typename T, size_t N>
-    constexpr size_t c_array_len(T(&)[N])
-    {
-        return N;
-    }
-    
-    /*
-     wrapIdx: Returns the (i % N)'th item in an array of length N.
-     */
-    template <typename T, size_t N>
-    T & wrap_idx(size_t index, T(&in_array)[N])
-    {
-        return in_array[index % in_array.size()];
-    }
-    
     template <typename T>
     bool value_in_vector(T value, const std::vector<T> & vector)
     {
