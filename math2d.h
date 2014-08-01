@@ -54,6 +54,16 @@ namespace atl
             return *this;
         }
         
+        size2f operator + (const size2f & in_otherSize) const
+        {
+            return size2f(w + in_otherSize.w, h + in_otherSize.h);
+        }
+        
+        size2f operator - (const size2f & in_otherSize) const
+        {
+            return size2f(w - in_otherSize.w, h - in_otherSize.h);
+        }
+        
         bool operator ==(size2f in_otherSize) {
             return w == in_otherSize.w && h == in_otherSize.h;
         }
