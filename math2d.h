@@ -368,6 +368,10 @@ namespace atl
         point2f bottom_right() const { return point2f(r, b); }
         size2f size() const { return size2f(width(), height()); }
         
+        bool empty() const {
+            return t <= b || r <= l;
+        }
+        
         void set(float in_t, float in_r, float in_b, float in_l) {
             t = in_t;
             r = in_r;
@@ -409,6 +413,14 @@ namespace atl
             r = std::max(r, in_otherBounds.r);
             b = std::min(b, in_otherBounds.b);
             l = std::min(l, in_otherBounds.l);
+        }
+        
+        bounds4f get_intersection(const bounds4f & in_otherBounds) const {
+            bounds4f result(std::min(t, in_otherBounds.t),
+                            std::min(r, in_otherBounds.r),
+                            std::max(b, in_otherBounds.b),
+                            std::max(l, in_otherBounds.l));
+            return result;
         }
         
         bool operator ==(const bounds4f & in_otherBounds) const {
