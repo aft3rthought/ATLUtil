@@ -85,8 +85,6 @@ namespace atl
         class vecLength
         {
         public:
-            vecLength(float in_dist) : _squaredValue(in_dist * in_dist) {}
-            
             vecLength(float in_vA, float in_vB) : _squaredValue(in_vA * in_vA + in_vB * in_vB) {}
             
             bool operator <(const vecLength & in_otherLength) const {
@@ -100,6 +98,8 @@ namespace atl
             float getValue() const {
                 return sqrtf(_squaredValue);
             }
+            
+            static vecLength forRadius(float in_radius) { return vecLength(in_radius, 0.f); }
             
         private:
             float _squaredValue;
@@ -250,14 +250,14 @@ namespace atl
         
         bool contains(const point2f & in_point) const
         {
-            return distance(in_point) < point2f::vecLength(radius);
+            return distance(in_point) < point2f::vecLength::forRadius(radius);
         }
         
         bool overlaps(const circlef & in_otherCircle) const
         {
             float combinedRadii = in_otherCircle.radius + radius;
             
-            return distance(in_otherCircle.center) < point2f::vecLength(combinedRadii);
+            return distance(in_otherCircle.center) < point2f::vecLength::forRadius(combinedRadii);
         }
     };
     
