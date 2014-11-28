@@ -6,7 +6,7 @@
 #define SGDebugBreak(msg) { printf(msg); __builtin_trap(); }
 #endif
 
-#ifdef APPLE_IOS
+#ifdef PLATFORM_IOS
 #include <cstdio>
 #define SGFatalErrorIf(cond, msg) if(cond) { printf(msg); __builtin_trap(); }
 #define SGFatalError(msg) { printf(msg); __builtin_trap(); }
