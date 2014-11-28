@@ -64,11 +64,11 @@ namespace atl
             return size2f(w - in_otherSize.w, h - in_otherSize.h);
         }
         
-        bool operator ==(size2f in_otherSize) {
+        bool operator ==(const size2f & in_otherSize) const {
             return w == in_otherSize.w && h == in_otherSize.h;
         }
         
-        bool operator !=(size2f in_otherSize) {
+        bool operator !=(const size2f & in_otherSize) const {
             return w != in_otherSize.w || h != in_otherSize.h;
         }
         
@@ -115,11 +115,11 @@ namespace atl
             y = in_y;
         }
         
-        bool operator == (const point2f & in_otherPoint) {
+        bool operator == (const point2f & in_otherPoint) const {
             return x == in_otherPoint.x && y == in_otherPoint.y;
         }
         
-        bool operator != (const point2f & in_otherPoint) {
+        bool operator != (const point2f & in_otherPoint) const {
             return x != in_otherPoint.x || y != in_otherPoint.y;
         }
         
