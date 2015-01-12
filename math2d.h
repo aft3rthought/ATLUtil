@@ -598,6 +598,8 @@ namespace atl
         int32_t width() const { return r - l; }
         int32_t height() const { return t - b; }
         
+        const static bounds4i EmptyGrowableBounds;
+        
         void extrude(int32_t in_amount)
         {
             t += in_amount;
@@ -606,7 +608,13 @@ namespace atl
             l -= in_amount;
         }
         
-        bool overlaps(const bounds4i & in_otherBounds) const {
+        enum class Contains {
+            Outside,
+            Edge,
+            Inside
+        };
+        
+        bool touches(const bounds4i & in_otherBounds) const {
             if(l > in_otherBounds.r ||
                r < in_otherBounds.l ||
                b > in_otherBounds.t ||
@@ -614,5 +622,82 @@ namespace atl
                 return false;
             return true;
         };
+        
+        Contains contains(int32_t in_x, int32_t in_y) const
+        {
+            if(in_x < l ||
+               in_y < b ||
+               in_x > r ||
+               in_y > t)
+                return Contains::Outside;
+            return Contains::Inside;
+        }
+       
+        Contains contains(const bounds4i & in_otherBounds) const
+        {
+            if(l > in_otherBounds.l &&
+               r < in_otherBounds.r &&
+               b > in_otherBounds.b &&
+               t < in_otherBounds.t)
+                return Contains::Inside;
+            return Contains::Outside;
+        }
+        
+        void set(int32_t in_t, int32_t in_r, int32_t in_b, int32_t in_l) {
+            t = in_t;
+            r = in_r;
+            b = in_b;
+            l = in_l;
+        }
+        
+        void translate(int32_t in_x, int32_t in_y) {
+            t += in_y;
+            r += in_x;
+            b += in_y;
+            l += in_x;
+        }
+        
+        void untranslate(int32_t in_x, int32_t in_y) {
+            t -= in_y;
+            r -= in_x;
+            b -= in_y;
+            l -= in_x;
+        }
+        
+        void include(int32_t in_ptX, int32_t in_ptY) {
+            t = std::max(t, in_ptY);
+            r = std::max(r, in_ptX);
+            b = std::min(b, in_ptY);
+            l = std::min(l, in_ptX);
+        }
+        
+        void include(const bounds4i & in_otherBounds) {
+            t = std::max(t, in_otherBounds.t);
+            r = std::max(r, in_otherBounds.r);
+            b = std::min(b, in_otherBounds.b);
+            l = std::min(l, in_otherBounds.l);
+        }
+        
+        bounds4i get_intersection(const bounds4i & in_otherBounds) const {
+            bounds4i result(std::min(t, in_otherBounds.t),
+                            std::min(r, in_otherBounds.r),
+                            std::max(b, in_otherBounds.b),
+                            std::max(l, in_otherBounds.l));
+            return result;
+        }
+        
+        bool operator ==(const bounds4i & in_otherBounds) const {
+            return (t == in_otherBounds.t &&
+                    r == in_otherBounds.r &&
+                    b == in_otherBounds.b &&
+                    l == in_otherBounds.l);
+        }
+        
+        bool operator !=(const bounds4i & in_otherBounds) const {
+            return (t != in_otherBounds.t ||
+                    r != in_otherBounds.r ||
+                    b != in_otherBounds.b ||
+                    l != in_otherBounds.l);
+        }
     };
 }
