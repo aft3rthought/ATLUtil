@@ -141,10 +141,8 @@ namespace atl
             return *this;
         }
 
-        point2f & operator - () {
-            x = -x;
-            y = -y;
-            return *this;
+        point2f operator - () const {
+            return point2f(-x, -y);
         }
         
         vecLength length() const {
