@@ -60,4 +60,11 @@ namespace atl
         }
         return std::string(chunkBeginItr, chunkEndItr);
     }
+    
+    std::string num_string(int32_t number)
+    {
+        char buff[16];
+        snprintf(buff, sizeof(buff), "%d", number);
+        return buff;
+    }
 }
