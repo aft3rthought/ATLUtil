@@ -172,10 +172,6 @@ namespace atl
             return point2f(-y, x);
         };
         
-        bool operator *= (const point2f & in_other) {
-            return x != in_other.x || y != in_other.y;
-        }
-        
         point2f & operator *= (float in_scalar) {
             x *= in_scalar;
             y *= in_scalar;
