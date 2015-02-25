@@ -92,7 +92,7 @@ namespace atl
      */
     constexpr float interpf(float from, float to, float percent)
     {
-        return from * (1.f - percent) + to * percent;
+        return from + percent * (to - from);
     }
 
     /*
@@ -102,6 +102,6 @@ namespace atl
      */
     constexpr double interpd(double from, double to, double percent)
     {
-        return from * (1.0 - percent) + to * percent;
+        return from + percent * (to - from);
     }
 }
