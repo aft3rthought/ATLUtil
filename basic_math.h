@@ -30,10 +30,10 @@ namespace atl
      Then interpolate from targetMin to targetMax using that value.
      Standard precision floating point version.
      */
-    constexpr float mapf(float value, float originMin, float originMax, float targetMin, float targetMax)
+    constexpr float mapf(float v, float originMin, float originMax, float targetMin, float targetMax)
     {
-        return value <= originMin ? targetMin :
-               value >= originMax ? targetMax : targetMin + (targetMax - targetMin) * ((value - originMin) / (originMax - originMin));
+        return v <= originMin ? targetMin :
+               v >= originMax ? targetMax : targetMin + (targetMax - targetMin) * ((v - originMin) / (originMax - originMin));
     }
 
     /*
@@ -42,10 +42,10 @@ namespace atl
      Then interpolate from targetMin to targetMax using that value.
      Double-precision floating point version.
      */
-    constexpr double mapd(double value, double originMin, double originMax, double targetMin, double targetMax)
+    constexpr double mapd(double v, double originMin, double originMax, double targetMin, double targetMax)
     {
-        return value <= originMin ? targetMin :
-               value >= originMax ? targetMax : targetMin + (targetMax - targetMin) * ((value - originMin) / (originMax - originMin));
+        return v <= originMin ? targetMin :
+               v >= originMax ? targetMax : targetMin + (targetMax - targetMin) * ((v - originMin) / (originMax - originMin));
     }
 
     /*
@@ -56,9 +56,9 @@ namespace atl
      lie within the range [0, 1], giving results outside of the range [targetMin, targetMax].
      Standard precision floating point version.
      */
-    constexpr float mapf_unclamped(float in_v, float originMin, float originMax, float targetMin, float targetMax)
+    constexpr float mapf_unclamped(float v, float originMin, float originMax, float targetMin, float targetMax)
     {
-        return targetMin + (targetMax - targetMin) * ((in_v - originMin) / (originMax - originMin));
+        return targetMin + (targetMax - targetMin) * ((v - originMin) / (originMax - originMin));
     }
 
     /*
@@ -69,9 +69,9 @@ namespace atl
      lie within the range [0, 1], giving results outside of the range [targetMin, targetMax].
      Double-precision floating point version.
      */
-    constexpr double mapd_unclamped(double in_v, double originMin, double originMax, double targetMin, double targetMax)
+    constexpr double mapd_unclamped(double v, double originMin, double originMax, double targetMin, double targetMax)
     {
-        return targetMin + (targetMax - targetMin) * ((in_v - originMin) / (originMax - originMin));
+        return targetMin + (targetMax - targetMin) * ((v - originMin) / (originMax - originMin));
     }
     
     /*
