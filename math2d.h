@@ -373,40 +373,67 @@ namespace atl
             l = in_l;
         }
         
-        void translate(float in_x, float in_y) {
-            t += in_y;
-            r += in_x;
-            b += in_y;
-            l += in_x;
+        bounds4f & operator += (const point2f & in_pt) {
+            t += in_pt.y;
+            r += in_pt.x;
+            b += in_pt.y;
+            l += in_pt.x;
+            return *this;
         }
         
-        void translate(const point2f & in_vec) {
-            translate(in_vec.x, in_vec.y);
+        bounds4f operator + (const point2f & in_pt) const {
+            return {
+                t + in_pt.y,
+                r + in_pt.x,
+                b + in_pt.y,
+                l + in_pt.x,
+            };
         }
         
-        void untranslate(float in_x, float in_y) {
-            t -= in_y;
-            r -= in_x;
-            b -= in_y;
-            l -= in_x;
+        bounds4f & operator -= (const point2f & in_pt) {
+            t -= in_pt.y;
+            r -= in_pt.x;
+            b -= in_pt.y;
+            l -= in_pt.x;
+            return *this;
         }
         
-        void untranslate(const point2f & in_vec) {
-            untranslate(in_vec.x, in_vec.y);
+        bounds4f operator - (const point2f & in_pt) const {
+            return {
+                t - in_pt.y,
+                r - in_pt.x,
+                b - in_pt.y,
+                l - in_pt.x,
+            };
         }
         
-        void include(const point2f & in_point) {
+        bounds4f & operator *= (const size2f & in_sz) {
+            scale_width_about_center(in_sz.w);
+            scale_height_about_center(in_sz.h);
+            return *this;
+        }
+        
+        bounds4f operator * (const size2f & in_sz) const {
+            auto result = *this;
+            result.scale_width_about_center(in_sz.w);
+            result.scale_height_about_center(in_sz.h);
+            return result;
+        }
+        
+        bounds4f & include(const point2f & in_point) {
             t = std::max(t, in_point.y);
             r = std::max(r, in_point.x);
             b = std::min(b, in_point.y);
             l = std::min(l, in_point.x);
+            return *this;
         }
         
-        void include(const bounds4f & in_otherBounds) {
+        bounds4f & include(const bounds4f & in_otherBounds) {
             t = std::max(t, in_otherBounds.t);
             r = std::max(r, in_otherBounds.r);
             b = std::min(b, in_otherBounds.b);
             l = std::min(l, in_otherBounds.l);
+            return *this;
         }
         
         bounds4f get_intersection(const bounds4f & in_otherBounds) const {
@@ -431,7 +458,7 @@ namespace atl
                     l != in_otherBounds.l);
         }
         
-        void scale_width_about_center(float in_scalar) {
+        bounds4f & scale_width_about_center(float in_scalar) {
             float l_halfWidth = width() / 2.f;
             float l_centerX = l + l_halfWidth;
             
@@ -439,14 +466,16 @@ namespace atl
             
             l = l_centerX - l_halfWidth;
             r = l_centerX + l_halfWidth;
+            return *this;
         }
         
-        void extrude_width(float in_amount) {
+        bounds4f & extrude_width(float in_amount) {
             l -= in_amount;
             r += in_amount;
+            return *this;
         }
         
-        void scale_height_about_center(float in_scalar) {
+        bounds4f & scale_height_about_center(float in_scalar) {
             float l_halfHeight = height() / 2.f;
             float l_centerY = b + l_halfHeight;
             
@@ -454,40 +483,45 @@ namespace atl
             
             b = l_centerY - l_halfHeight;
             t = l_centerY + l_halfHeight;
+            return *this;
         }
         
-        void extrude_height(float in_amount) {
+        bounds4f & extrude_height(float in_amount) {
             b -= in_amount;
             t += in_amount;
+            return *this;
         }
         
-        void scale_about_center(float in_scalar) {
+        bounds4f & scale_about_center(float in_scalar) {
             scale_width_about_center(in_scalar);
             scale_height_about_center(in_scalar);
+            return *this;
         }
         
-        void extrude(float in_amount) {
+        bounds4f & extrude(float in_amount) {
             extrude_width(in_amount);
             extrude_height(in_amount);
+            return *this;
         }
         
-        bounds4f flipx() {
+        bounds4f get_flipx() {
             return bounds4f(t, l, b, r);
         }
         
-        bounds4f flipy() {
+        bounds4f get_flipy() {
             return bounds4f(b, r, t, l);
         }
         
-        void anchor_in_parent(const bounds4f & in_parent, anchoring in_anchoring) {
-            bounds4f l_result = in_parent.sub_bounds_with_size(size(), in_anchoring);
+        bounds4f & anchor_in_parent(const bounds4f & in_parent, anchoring in_anchoring) {
+            bounds4f l_result = in_parent.get_sub_bounds_with_size(size(), in_anchoring);
             t = l_result.t;
             r = l_result.r;
             b = l_result.b;
             l = l_result.l;
+            return *this;
         }
         
-        bounds4f sub_bounds_with_size(const size2f & in_size, anchoring in_anchoring) const
+        bounds4f get_sub_bounds_with_size(const size2f & in_size, anchoring in_anchoring) const
         {
             bounds4f l_result;
             switch(in_anchoring)
@@ -567,12 +601,13 @@ namespace atl
             return false;
         }
         
-        void interpolate(const bounds4f & in_to, float in_val)
+        bounds4f & interpolate(const bounds4f & in_to, float in_val)
         {
             t = interpf(t, in_to.t, in_val);
             r = interpf(r, in_to.r, in_val);
             b = interpf(b, in_to.b, in_val);
             l = interpf(l, in_to.l, in_val);
+            return *this;
         }
     };
     
