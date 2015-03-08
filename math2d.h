@@ -34,34 +34,44 @@ namespace atl
         
         const static size2f Identity;
         
-        size2f operator *(const float & in_scalar) const {
-            return size2f(w * in_scalar, h * in_scalar);
-        }
-        
-        size2f & operator *=(const float & in_scalar) {
+        size2f & operator *= (const float & in_scalar) {
             w *= in_scalar;
             h *= in_scalar;
             return *this;
         }
         
-        size2f operator /(const float & in_scalar) const {
-            return size2f(w / in_scalar, h / in_scalar);
+        size2f & operator /= (const float & in_scalar) {
+            return *this *= (1.f / in_scalar);
+        }
+
+        size2f & operator += (const size2f & in_otherSize) {
+            w += in_otherSize.w;
+            h += in_otherSize.h;
+            return *this;
         }
         
-        size2f & operator /=(const float & in_scalar) {
-            w /= in_scalar;
-            h /= in_scalar;
+        size2f & operator -= (const size2f & in_otherSize) {
+            w -= in_otherSize.w;
+            h -= in_otherSize.h;
             return *this;
+        }
+        
+        size2f operator * (const float & in_scalar) const {
+            return size2f(*this) *= in_scalar;
+        }
+        
+        size2f operator / (const float & in_scalar) const {
+            return size2f(*this) /= in_scalar;
         }
         
         size2f operator + (const size2f & in_otherSize) const
         {
-            return size2f(w + in_otherSize.w, h + in_otherSize.h);
+            return size2f(*this) += in_otherSize;
         }
         
         size2f operator - (const size2f & in_otherSize) const
         {
-            return size2f(w - in_otherSize.w, h - in_otherSize.h);
+            return size2f(*this) -= in_otherSize;
         }
         
         bool operator ==(const size2f & in_otherSize) const {
@@ -72,47 +82,55 @@ namespace atl
             return w != in_otherSize.w || h != in_otherSize.h;
         }
         
-        void interpolate(const size2f& in_to, float in_val)
+        size2f & interpolate(const size2f & in_to, float in_val)
         {
             w = interpf(w, in_to.w, in_val);
             h = interpf(h, in_to.h, in_val);
+            return *this;
         }
     };
 
     class point2f
     {
     public:
-        class vecLength
+        class vector_length
         {
         public:
-            vecLength(float in_vA, float in_vB) : _squaredValue(in_vA * in_vA + in_vB * in_vB) {}
+            vector_length(float in_x, float in_y) :
+            squared_value(in_x * in_x + in_y * in_y) {}
             
-            bool operator <(const vecLength & in_otherLength) const {
-                return _squaredValue < in_otherLength._squaredValue;
+            bool operator <(const vector_length & in_otherLength) const {
+                return squared_value < in_otherLength.squared_value;
             }
             
-            bool operator >(const vecLength & in_otherLength) const {
-                return _squaredValue > in_otherLength._squaredValue;
+            bool operator >(const vector_length & in_otherLength) const {
+                return squared_value > in_otherLength.squared_value;
             }
             
-            float getValue() const {
-                return sqrtf(_squaredValue);
+            float get_value() const {
+                return sqrtf(squared_value);
             }
             
-            static vecLength forRadius(float in_radius) { return vecLength(in_radius, 0.f); }
+            static vector_length for_radius(float in_radius) {
+                return {in_radius, 0.f};
+            }
             
-        private:
-            float _squaredValue;
+            float squared_value;
         };
         
+        const static point2f AxisX;
+        const static point2f AxisY;
+        const static point2f Zero;
+
         float x, y;
         
         point2f(float in_x, float in_y) : x(in_x), y(in_y) {};
         point2f() {};
         
-        void set(float in_x, float in_y) {
+        point2f & set(float in_x, float in_y) {
             x = in_x;
             y = in_y;
+            return *this;
         }
         
         bool operator == (const point2f & in_otherPoint) const {
@@ -123,21 +141,10 @@ namespace atl
             return x != in_otherPoint.x || y != in_otherPoint.y;
         }
         
-        void interpolate(const point2f & in_to, float in_val)
+        point2f & interpolate(const point2f & in_to, float in_val)
         {
             x = interpf(x, in_to.x, in_val);
             y = interpf(y, in_to.y, in_val);
-        }
-        
-        point2f & operator += (const point2f & in_vec) {
-            x += in_vec.x;
-            y += in_vec.y;
-            return *this;
-        }
-        
-        point2f & operator -= (const point2f & in_vec) {
-            x -= in_vec.x;
-            y -= in_vec.y;
             return *this;
         }
 
@@ -145,32 +152,37 @@ namespace atl
             return point2f(-x, -y);
         }
         
-        vecLength length() const {
-            return vecLength(x, y);
+        vector_length length() const {
+            return vector_length(x, y);
         }
         
-        void normalize() {
-            float currentLength = length().getValue();
-            x = x / currentLength;
-            y = y / currentLength;
+        point2f & normalize() {
+            return *this /= length().get_value();
+        }
+        
+        point2f get_normal() const {
+            return *this / length().get_value();
+        };
+        
+        float dot(const point2f & in_otherPoint) const {
+            return x * in_otherPoint.x + y * in_otherPoint.y;
         }
         
         float dot() const {
-            return x * x + y * y;
-        }
-
-        float dot(const point2f & in_other) const {
-            return x * in_other.x + y * in_other.y;
+            return dot(*this);
         }
         
-        point2f getNormal() const {
-            float currentLength = length().getValue();
-            return point2f(x / currentLength, y / currentLength);
-        };
+        point2f & operator += (const point2f & in_otherPoint) {
+            x += in_otherPoint.x;
+            y += in_otherPoint.y;
+            return *this;
+        }
         
-        point2f getCross() const {
-            return point2f(-y, x);
-        };
+        point2f & operator -= (const point2f & in_otherPoint) {
+            x -= in_otherPoint.x;
+            y -= in_otherPoint.y;
+            return *this;
+        }
         
         point2f & operator *= (float in_scalar) {
             x *= in_scalar;
@@ -179,32 +191,39 @@ namespace atl
         }
         
         point2f & operator /= (float in_scalar) {
-            x /= in_scalar;
-            y /= in_scalar;
-            return *this;
+            return *this *= (1.f / in_scalar);
+        }
+        
+        point2f operator + (const point2f & in_otherPt) const {
+            return point2f(*this) += in_otherPt;
+        }
+        
+        point2f operator - (const point2f & in_otherPt) const {
+            return point2f(*this) -= in_otherPt;
         }
         
         point2f operator * (float in_scalar) const {
-            return point2f(x * in_scalar, y * in_scalar);
+            return point2f(*this) *= in_scalar;
         }
         
         point2f operator / (float in_scalar) const {
-            return point2f(x / in_scalar, y / in_scalar);
+            return point2f(*this) /= in_scalar;
         }
         
-        static point2f ForAngle(float in_angle)
-        {
+        static point2f get_normal_for_angle(float in_angle) {
             return point2f(cosf(in_angle), sinf(in_angle));
         }
-      
-        point2f operator + (const point2f & in_otherPt) const
-        {
-            return point2f(x + in_otherPt.x, y + in_otherPt.y);
+        
+        point2f get_projection(const point2f & in_otherPt) const {
+            return point2f(*this) * dot(in_otherPt) / dot();
         }
         
-        point2f operator - (const point2f & in_otherPt) const
-        {
-            return point2f(x - in_otherPt.x, y - in_otherPt.y);
+        point2f get_cross_left() const {
+            return point2f(-y, x);
+        }
+        
+        point2f get_cross_right() const {
+            return point2f(y, -x);
         }
     };
 
@@ -237,37 +256,181 @@ namespace atl
         radius(in_radius)
         {}
         
-        point2f::vecLength distance(const point2f & in_point) const
+        point2f::vector_length distance(const point2f & in_point) const
         {
             return (in_point - center).length();
         }
         
         bool contains(const point2f & in_point) const
         {
-            return distance(in_point) < point2f::vecLength::forRadius(radius);
+            return distance(in_point) < point2f::vector_length::for_radius(radius);
         }
         
         bool overlaps(const circlef & in_otherCircle) const
         {
-            float combinedRadii = in_otherCircle.radius + radius;
+            float l_combined_radii = in_otherCircle.radius + radius;
             
-            return distance(in_otherCircle.center) < point2f::vecLength::forRadius(combinedRadii);
+            return distance(in_otherCircle.center) < point2f::vector_length::for_radius(l_combined_radii);
         }
     };
     
-    class bounds4f
+    /*
+     atl::rangef
+     */
+    class rangef
+    {
+        // anchoring can be done with some enum/template helpers:
+        //    anchors: min, center, max
+        // directions: up, down
+    public:
+        float min, max;
+        
+        rangef(float in_min, float in_max) :
+        min(in_min),
+        max(in_max)
+        {}
+        
+        rangef()
+        {}
+        
+        const static rangef Max;
+        const static rangef InvertedMax;
+        
+        bool operator == (const rangef & in_otherRange) const {
+            return min == in_otherRange.min && max == in_otherRange.max;
+        }
+        
+        bool operator != (const rangef & in_otherRange) const {
+            return min != in_otherRange.min || max != in_otherRange.max;
+        }
+        
+        rangef & move_up(float in_offset) {
+            min += in_offset;
+            max += in_offset;
+            return *this;
+        }
+
+        rangef & move_down(float in_offset) {
+            min -= in_offset;
+            max -= in_offset;
+            return *this;
+        }
+        
+        rangef & grow(float in_offset) {
+            min -= in_offset;
+            max += in_offset;
+            return *this;
+        }
+
+        rangef & shrink(float in_offset) {
+            min += in_offset;
+            max -= in_offset;
+            return *this;
+        }
+        
+        rangef & scale(float in_scalar) {
+            float l_center = (max + min) * 0.5f;
+            float l_newHalfLength = (max - min) * in_scalar * 0.5f;
+            min = l_center - l_newHalfLength;
+            max = l_center + l_newHalfLength;
+            return *this;
+        }
+        
+        rangef & flip() {
+            std::swap(min, max);
+            return *this;
+        }
+        
+        bool empty() const {
+            return max <= min;
+        }
+
+        bool inverted() const {
+            return max < min;
+        }
+        
+        float length() const {
+            return max - min;
+        }
+        
+        float center() const {
+            return (min + max) * 0.5f;
+        }
+        
+        float pct(float in_t) const {
+            return (max - min) * in_t + min;
+        }
+        
+        bool contains(float in_value) const {
+            return in_value >= min && in_value <= max;
+        }
+
+        bool contains(const rangef & in_otherRange) const {
+            return in_otherRange.min >= min && in_otherRange.max <= max;
+        }
+        
+        bool overlaps(const rangef & in_otherRange) const {
+            return in_otherRange.min <= max && in_otherRange.max >= min;
+        }
+        
+        rangef get_intersection(const rangef & in_otherRange) const {
+            return {
+                std::max(min, in_otherRange.min),
+                std::min(max, in_otherRange.max)
+            };
+        }
+        
+        rangef & include(float in_value) {
+            min = std::min(min, in_value);
+            max = std::max(max, in_value);
+            return *this;
+        }
+
+        rangef & include(const rangef & in_otherRange) {
+            min = std::min(min, in_otherRange.min);
+            max = std::max(max, in_otherRange.max);
+            return *this;
+        }
+        
+        rangef & interpolate(const rangef & in_to, float in_t) {
+            min = interpf(min, in_to.min, in_t);
+            max = interpf(max, in_to.max, in_t);
+            return *this;
+        }
+    };
+    
+    class box2f
     {
     public:
-        float t, r, b, l;
+        union {
+            struct {
+                float l, r, b, t;
+            };
+            struct {
+                rangef x, y;
+            };
+        };
         
-        bounds4f(float in_t, float in_r, float in_b, float in_l) :
+        box2f(const rangef & in_x, const rangef & in_y) :
+        x(in_x),
+        y(in_y)
+        {}
+        
+        box2f(float in_t, float in_r, float in_b, float in_l) :
         t(in_t),
         r(in_r),
         b(in_b),
         l(in_l)
         {}
+
+        box2f(const atl::point2f & in_pt) :
+        t(in_pt.y),
+        r(in_pt.x),
+        b(in_pt.y),
+        l(in_pt.x)
+        {}
         
-        bounds4f(const atl::point2f & in_ptA, const atl::point2f & in_ptB)
+        box2f(const atl::point2f & in_ptA, const atl::point2f & in_ptB)
         {
             if(in_ptA.x <= in_ptB.x)
             {
@@ -291,7 +454,7 @@ namespace atl
             }
         }
         
-        bounds4f(const point2f & in_corner, const size2f & in_size, anchoring in_anchoring)
+        box2f(const point2f & in_corner, const size2f & in_size, anchoring in_anchoring)
         {
             // X coordinate:
             switch(in_anchoring)
@@ -358,186 +521,151 @@ namespace atl
             }
         }
         
-        bounds4f()
-        {}
-        
-        bounds4f(circlef in_circle) :
+        box2f(circlef in_circle) :
         t(in_circle.center.y + in_circle.radius),
         r(in_circle.center.x + in_circle.radius),
         b(in_circle.center.y - in_circle.radius),
         l(in_circle.center.x - in_circle.radius)
         {}
         
-        const static bounds4f EmptyGrowableBounds;
+        box2f()
+        {}
         
-        float centerx() const { return (l + r) / 2.f; }
-        float centery() const { return (t + b) / 2.f; }
+        const static box2f MaxInvertedBounds;
+        const static box2f MaxBounds;
         
-        float pctx(float in_pct) const { return l + (r - l) * in_pct; }
-        float pcty(float in_pct) const { return b + (t - b) * in_pct; }
+        float width() const { return x.length(); }
+        float height() const { return y.length(); }
+        size2f size() const { return size2f(width(), height()); }
         
-        float width() const { return r - l; }
-        float height() const { return t - b; }
-        
-        point2f center() const { return point2f(centerx(), centery()); }
+        point2f center() const { return point2f(x.center(), y.center()); }
         point2f bottom_left() const { return point2f(l, b); }
         point2f top_left() const { return point2f(l, t); }
         point2f top_right() const { return point2f(r, t); }
         point2f bottom_right() const { return point2f(r, b); }
-        size2f size() const { return size2f(width(), height()); }
-        
-        bool empty() const {
-            return t <= b || r <= l;
+        point2f center_left() const { return point2f(l, y.center()); }
+        point2f top_center() const { return point2f(x.center(), t); }
+        point2f center_right() const { return point2f(r, y.center()); }
+        point2f bottom_center() const { return point2f(x.center(), b); }
+
+        bool inverted() const {
+            return x.inverted() || y.inverted();
         }
         
-        void set(float in_t, float in_r, float in_b, float in_l) {
+        bool empty() const {
+            return x.empty() || y.empty();
+        }
+        
+        box2f & set(float in_t, float in_r, float in_b, float in_l) {
             t = in_t;
             r = in_r;
             b = in_b;
             l = in_l;
-        }
-        
-        bounds4f & operator += (const point2f & in_pt) {
-            t += in_pt.y;
-            r += in_pt.x;
-            b += in_pt.y;
-            l += in_pt.x;
             return *this;
         }
         
-        bounds4f operator + (const point2f & in_pt) const {
+        /*
+         * grow/shrink by a float
+         */
+        box2f & operator += (float in_offset) {
+            x.grow(in_offset);
+            y.grow(in_offset);
+            return *this;
+        }
+        
+        box2f & operator -= (float in_offset) {
+            x.shrink(in_offset);
+            y.shrink(in_offset);
+            return *this;
+        }
+        
+        box2f operator + (float in_offset) const {
+            return box2f(*this) += in_offset;
+        }
+        
+        box2f operator - (float in_offset) const {
+            return box2f(*this) -= in_offset;
+        }
+        
+        /*
+         * translate/untranslate by a point
+         */
+        box2f & operator += (const point2f & in_pt) {
+            x.move_up(in_pt.x);
+            y.move_up(in_pt.y);
+            return *this;
+        }
+        
+        box2f & operator -= (const point2f & in_pt) {
+            x.move_down(in_pt.x);
+            y.move_down(in_pt.y);
+            return *this;
+        }
+        
+        box2f operator + (const point2f & in_pt) const {
+            return box2f(*this) += in_pt;
+        }
+        
+        box2f operator - (const point2f & in_pt) const {
+            return box2f(*this) -= in_pt;
+        }
+        
+        /*
+         * grow/shrink by a percent specified by a size
+         */
+        box2f & operator *= (const size2f & in_size) {
+            x.scale(in_size.w);
+            y.scale(in_size.h);
+            return *this;
+        }
+        
+        box2f operator * (const size2f & in_size) const {
+            return box2f(*this) *= in_size;
+        }
+        
+        /*
+         * range functions
+         */
+        box2f & include(const point2f & in_point) {
+            x.include(in_point.x);
+            y.include(in_point.y);
+            return *this;
+        }
+        
+        box2f & include(const box2f & in_otherBounds) {
+            x.include(in_otherBounds.x);
+            y.include(in_otherBounds.y);
+            return *this;
+        }
+        
+        box2f get_intersection(const box2f & in_otherBounds) const {
             return {
-                t + in_pt.y,
-                r + in_pt.x,
-                b + in_pt.y,
-                l + in_pt.x,
+                x.get_intersection(in_otherBounds.x),
+                y.get_intersection(in_otherBounds.y)
             };
         }
         
-        bounds4f & operator -= (const point2f & in_pt) {
-            t -= in_pt.y;
-            r -= in_pt.x;
-            b -= in_pt.y;
-            l -= in_pt.x;
-            return *this;
+        bool operator ==(const box2f & in_otherBounds) const {
+            return x == in_otherBounds.x && y == in_otherBounds.y;
         }
         
-        bounds4f operator - (const point2f & in_pt) const {
-            return {
-                t - in_pt.y,
-                r - in_pt.x,
-                b - in_pt.y,
-                l - in_pt.x,
-            };
+        bool operator !=(const box2f & in_otherBounds) const {
+            return x != in_otherBounds.x || y != in_otherBounds.y;
         }
         
-        bounds4f & operator *= (const size2f & in_sz) {
-            scale_width_about_center(in_sz.w);
-            scale_height_about_center(in_sz.h);
-            return *this;
+        /*
+         * constructions
+         */
+        box2f get_flipx() const {
+            return { rangef(x).flip(), y };
+        }
+
+        box2f get_flipy() const {
+            return { x, rangef(y).flip() };
         }
         
-        bounds4f operator * (const size2f & in_sz) const {
-            auto result = *this;
-            result.scale_width_about_center(in_sz.w);
-            result.scale_height_about_center(in_sz.h);
-            return result;
-        }
-        
-        bounds4f & include(const point2f & in_point) {
-            t = std::max(t, in_point.y);
-            r = std::max(r, in_point.x);
-            b = std::min(b, in_point.y);
-            l = std::min(l, in_point.x);
-            return *this;
-        }
-        
-        bounds4f & include(const bounds4f & in_otherBounds) {
-            t = std::max(t, in_otherBounds.t);
-            r = std::max(r, in_otherBounds.r);
-            b = std::min(b, in_otherBounds.b);
-            l = std::min(l, in_otherBounds.l);
-            return *this;
-        }
-        
-        bounds4f get_intersection(const bounds4f & in_otherBounds) const {
-            bounds4f result(std::min(t, in_otherBounds.t),
-                            std::min(r, in_otherBounds.r),
-                            std::max(b, in_otherBounds.b),
-                            std::max(l, in_otherBounds.l));
-            return result;
-        }
-        
-        bool operator ==(const bounds4f & in_otherBounds) const {
-            return (t == in_otherBounds.t &&
-                    r == in_otherBounds.r &&
-                    b == in_otherBounds.b &&
-                    l == in_otherBounds.l);
-        }
-        
-        bool operator !=(const bounds4f & in_otherBounds) const {
-            return (t != in_otherBounds.t ||
-                    r != in_otherBounds.r ||
-                    b != in_otherBounds.b ||
-                    l != in_otherBounds.l);
-        }
-        
-        bounds4f & scale_width_about_center(float in_scalar) {
-            float l_halfWidth = width() / 2.f;
-            float l_centerX = l + l_halfWidth;
-            
-            l_halfWidth *= in_scalar;
-            
-            l = l_centerX - l_halfWidth;
-            r = l_centerX + l_halfWidth;
-            return *this;
-        }
-        
-        bounds4f & extrude_width(float in_amount) {
-            l -= in_amount;
-            r += in_amount;
-            return *this;
-        }
-        
-        bounds4f & scale_height_about_center(float in_scalar) {
-            float l_halfHeight = height() / 2.f;
-            float l_centerY = b + l_halfHeight;
-            
-            l_halfHeight *= in_scalar;
-            
-            b = l_centerY - l_halfHeight;
-            t = l_centerY + l_halfHeight;
-            return *this;
-        }
-        
-        bounds4f & extrude_height(float in_amount) {
-            b -= in_amount;
-            t += in_amount;
-            return *this;
-        }
-        
-        bounds4f & scale_about_center(float in_scalar) {
-            scale_width_about_center(in_scalar);
-            scale_height_about_center(in_scalar);
-            return *this;
-        }
-        
-        bounds4f & extrude(float in_amount) {
-            extrude_width(in_amount);
-            extrude_height(in_amount);
-            return *this;
-        }
-        
-        bounds4f get_flipx() {
-            return bounds4f(t, l, b, r);
-        }
-        
-        bounds4f get_flipy() {
-            return bounds4f(b, r, t, l);
-        }
-        
-        bounds4f & anchor_in_parent(const bounds4f & in_parent, anchoring in_anchoring) {
-            bounds4f l_result = in_parent.get_sub_bounds_with_size(size(), in_anchoring);
+        box2f & anchor_in_parent(const box2f & in_parent, anchoring in_anchoring) {
+            box2f l_result = in_parent.get_sub_bounds_with_size(size(), in_anchoring);
             t = l_result.t;
             r = l_result.r;
             b = l_result.b;
@@ -545,9 +673,9 @@ namespace atl
             return *this;
         }
         
-        bounds4f get_sub_bounds_with_size(const size2f & in_size, anchoring in_anchoring) const
+        box2f get_sub_bounds_with_size(const size2f & in_size, anchoring in_anchoring) const
         {
-            bounds4f l_result;
+            box2f l_result;
             switch(in_anchoring)
             {
                 case anchoring::top_left:
@@ -597,40 +725,23 @@ namespace atl
         
         bool contains(const point2f & in_p) const
         {
-            if(in_p.x < l ||
-               in_p.y < b ||
-               in_p.x > r ||
-               in_p.y > t)
-                return false;
-            return true;
+            return x.contains(in_p.x) && y.contains(in_p.y);
         }
         
-        bool touches(const bounds4f & in_otherBounds) const
+        bool touches(const box2f & in_otherBounds) const
         {
-            if(l > in_otherBounds.r ||
-               r < in_otherBounds.l ||
-               b > in_otherBounds.t ||
-               t < in_otherBounds.b)
-                return false;
-            return true;
+            return x.overlaps(in_otherBounds.x) && y.overlaps(in_otherBounds.y);
         }
         
-        bool contains(const bounds4f & in_otherBounds) const
+        bool contains(const box2f & in_otherBounds) const
         {
-            if(l > in_otherBounds.l &&
-               r < in_otherBounds.r &&
-               b > in_otherBounds.b &&
-               t < in_otherBounds.t)
-                return true;
-            return false;
+            return x.contains(in_otherBounds.x) && y.contains(in_otherBounds.y);
         }
         
-        bounds4f & interpolate(const bounds4f & in_to, float in_val)
+        box2f & interpolate(const box2f & in_to, float in_t)
         {
-            t = interpf(t, in_to.t, in_val);
-            r = interpf(r, in_to.r, in_val);
-            b = interpf(b, in_to.b, in_val);
-            l = interpf(l, in_to.l, in_val);
+            x.interpolate(in_to.x, in_t);
+            y.interpolate(in_to.y, in_t);
             return *this;
         }
     };

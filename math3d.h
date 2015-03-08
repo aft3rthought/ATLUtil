@@ -52,10 +52,11 @@ namespace atl
         
         point3f() {};
         
-        void set(float in_x, float in_y, float in_z) {
+        point3f & set(float in_x, float in_y, float in_z) {
             x = in_x;
             y = in_y;
             z = in_z;
+            return *this;
         }
         
         bool operator == (const point3f & in_otherPoint) const {
@@ -83,33 +84,32 @@ namespace atl
         }
         
         point3f & normalize() {
-            *this /= length().get_value();
-            return *this;
-        }
-        
-        float dot(const point3f & in_other) const {
-            return x * in_other.x + y * in_other.y + z * in_other.z;
-        }
-        
-        float dot() const {
-            return dot(*this);
+            return *this /= length().get_value();
         }
         
         point3f get_normal() const {
             return *this / length().get_value();
         };
         
-        point3f & operator += (const point3f & in_vec) {
-            x += in_vec.x;
-            y += in_vec.y;
-            z += in_vec.z;
+        float dot(const point3f & in_otherPoint) const {
+            return x * in_otherPoint.x + y * in_otherPoint.y + z * in_otherPoint.z;
+        }
+        
+        float dot() const {
+            return dot(*this);
+        }
+        
+        point3f & operator += (const point3f & in_otherPoint) {
+            x += in_otherPoint.x;
+            y += in_otherPoint.y;
+            z += in_otherPoint.z;
             return *this;
         }
         
-        point3f & operator -= (const point3f & in_vec) {
-            x -= in_vec.x;
-            y -= in_vec.y;
-            z -= in_vec.z;
+        point3f & operator -= (const point3f & in_otherPoint) {
+            x -= in_otherPoint.x;
+            y -= in_otherPoint.y;
+            z -= in_otherPoint.z;
             return *this;
         }
         
@@ -144,15 +144,15 @@ namespace atl
             return point3f(*this) -= in_otherPoint;
         }
 
-        point3f get_projection(const point3f & otherAxis) const {
-            return point3f(*this) * dot(otherAxis) / dot();
+        point3f get_projection(const point3f & in_otherPoint) const {
+            return point3f(*this) * dot(in_otherPoint) / dot();
         }
         
-        point3f get_cross(const point3f & otherAxis) const {
+        point3f get_cross(const point3f & in_otherPoint) const {
             return {
-                y * otherAxis.z - z * otherAxis.y,
-                z * otherAxis.x - x * otherAxis.z,
-                x * otherAxis.y - y * otherAxis.x
+                y * in_otherPoint.z - z * in_otherPoint.y,
+                z * in_otherPoint.x - x * in_otherPoint.z,
+                x * in_otherPoint.y - y * in_otherPoint.x
             };
         }
     };
