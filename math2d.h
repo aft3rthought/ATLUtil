@@ -267,6 +267,30 @@ namespace atl
         l(in_l)
         {}
         
+        bounds4f(const atl::point2f & in_ptA, const atl::point2f & in_ptB)
+        {
+            if(in_ptA.x <= in_ptB.x)
+            {
+                l = in_ptA.x;
+                r = in_ptB.x;
+            }
+            else
+            {
+                l = in_ptB.x;
+                r = in_ptA.x;
+            }
+            if(in_ptA.y <= in_ptB.y)
+            {
+                b = in_ptA.y;
+                t = in_ptB.y;
+            }
+            else
+            {
+                b = in_ptB.y;
+                t = in_ptA.y;
+            }
+        }
+        
         bounds4f(const point2f & in_corner, const size2f & in_size, anchoring in_anchoring)
         {
             // X coordinate:
