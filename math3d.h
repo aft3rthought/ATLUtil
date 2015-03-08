@@ -12,28 +12,29 @@ namespace atl
     class point3f
     {
     public:
-        class vecLength
+        class vector_length
         {
         public:
-            vecLength(float in_vX, float in_vY, float in_vZ) :
-            _squaredValue(in_vX * in_vX + in_vY * in_vY + in_vZ * in_vZ) {}
+            vector_length(float in_x, float in_y, float in_z) :
+            squared_value(in_x * in_x + in_y * in_y + in_z * in_z) {}
             
-            bool operator <(const vecLength & in_otherLength) const {
-                return _squaredValue < in_otherLength._squaredValue;
+            bool operator <(const vector_length & in_otherLength) const {
+                return squared_value < in_otherLength.squared_value;
             }
             
-            bool operator >(const vecLength & in_otherLength) const {
-                return _squaredValue > in_otherLength._squaredValue;
+            bool operator >(const vector_length & in_otherLength) const {
+                return squared_value > in_otherLength.squared_value;
             }
             
-            float getValue() const {
-                return sqrtf(_squaredValue);
+            float get_value() const {
+                return sqrtf(squared_value);
             }
             
-            static vecLength forRadius(float in_radius) { return vecLength(in_radius, 0.f, 0.f); }
+            static vector_length for_radius(float in_radius) {
+                return {in_radius, 0.f, 0.f};
+            }
             
-        private:
-            float _squaredValue;
+            float squared_value;
         };
         
         const static point3f AxisX;
@@ -43,7 +44,12 @@ namespace atl
         
         float x, y, z;
         
-        point3f(float in_x, float in_y, float in_z) : x(in_x), y(in_y), z(in_z) {};
+        point3f(float in_x, float in_y, float in_z) :
+        x(in_x),
+        y(in_y),
+        z(in_z)
+        {};
+        
         point3f() {};
         
         void set(float in_x, float in_y, float in_z) {
@@ -69,32 +75,28 @@ namespace atl
         }
 
         point3f operator - () const {
-            return point3f(-x, -y, -z);
+            return {-x, -y, -z};
         }
         
-        vecLength length() const {
-            return vecLength(x, y, z);
+        vector_length length() const {
+            return vector_length(x, y, z);
         }
         
         point3f & normalize() {
-            float currentLength = length().getValue();
-            x = x / currentLength;
-            y = y / currentLength;
-            z = z / currentLength;
+            *this /= length().get_value();
             return *this;
         }
         
-        float dot() const {
-            return x * x + y * y + z * z;
-        }
-
         float dot(const point3f & in_other) const {
             return x * in_other.x + y * in_other.y + z * in_other.z;
         }
         
-        point3f getNormal() const {
-            float currentLength = length().getValue();
-            return point3f(x / currentLength, y / currentLength, z / currentLength);
+        float dot() const {
+            return dot(*this);
+        }
+        
+        point3f get_normal() const {
+            return *this / length().get_value();
         };
         
         point3f & operator += (const point3f & in_vec) {
@@ -119,35 +121,34 @@ namespace atl
         }
         
         point3f & operator /= (float in_scalar) {
-            x /= in_scalar;
-            y /= in_scalar;
-            z /= in_scalar;
+            in_scalar = 1.f / in_scalar;
+            x *= in_scalar;
+            y *= in_scalar;
+            z *= in_scalar;
             return *this;
         }
         
         point3f operator * (float in_scalar) const {
-            return point3f(x * in_scalar, y * in_scalar, z * in_scalar);
+            return point3f(*this) *= in_scalar;
         }
         
         point3f operator / (float in_scalar) const {
-            return point3f(x / in_scalar, y / in_scalar, z / in_scalar);
+            return point3f(*this) /= in_scalar;
         }
         
-        point3f operator + (const point3f & in_otherPoint) const
-        {
-            return point3f(x + in_otherPoint.x, y + in_otherPoint.y, z + in_otherPoint.z);
+        point3f operator + (const point3f & in_otherPoint) const {
+            return point3f(*this) += in_otherPoint;
         }
         
-        point3f operator - (const point3f & in_otherPoint) const
-        {
-            return point3f(x - in_otherPoint.x, y - in_otherPoint.y, z - in_otherPoint.z);
+        point3f operator - (const point3f & in_otherPoint) const {
+            return point3f(*this) -= in_otherPoint;
         }
 
-        point3f getProjectionAgainst(const point3f & otherAxis) const {
+        point3f get_projection(const point3f & otherAxis) const {
             return point3f(*this) * dot(otherAxis) / dot();
         }
         
-        point3f getCrossWith(const point3f & otherAxis) const {
+        point3f get_cross(const point3f & otherAxis) const {
             return {
                 y * otherAxis.z - z * otherAxis.y,
                 z * otherAxis.x - x * otherAxis.z,
