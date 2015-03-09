@@ -6,6 +6,7 @@ namespace atl
     class size2f;
     class point2f;
     class circlef;
-    class bounds4f;
+    class rangef;
+    class box2f;
     class bounds4i;
 }

@@ -3,8 +3,11 @@
 #pragma once
 
 #include "basic_math.h"
+#include "math2d_fwd.h"
 #include <cmath>
 #include <algorithm>
+#include <array>
+#include <vector>
 
 namespace atl
 {
@@ -20,7 +23,7 @@ namespace atl
         bottom_center,
         bottom_right
     };
-
+    
     class size2f
     {
     public:
@@ -225,11 +228,11 @@ namespace atl
         point2f get_cross_right() const {
             return point2f(y, -x);
         }
+        
+        box2f get_box(const atl::size2f & in_size, anchoring in_anchoring);
     };
 
-    /*
-     atl::circlef
-     */
+#pragma mark - circlef
     class circlef
     {
     public:
@@ -274,17 +277,14 @@ namespace atl
         }
     };
     
-    /*
-     atl::rangef
-     */
+#pragma mark - rangef
     class rangef
     {
-        // anchoring can be done with some enum/template helpers:
-        //    anchors: min, center, max
-        // directions: up, down
     public:
+#pragma mark Members
         float min, max;
         
+#pragma mark Constructors
         rangef(float in_min, float in_max) :
         min(in_min),
         max(in_max)
@@ -293,52 +293,17 @@ namespace atl
         rangef()
         {}
         
+#pragma mark Static properties
         const static rangef Max;
         const static rangef InvertedMax;
         
+#pragma mark Queries
         bool operator == (const rangef & in_otherRange) const {
             return min == in_otherRange.min && max == in_otherRange.max;
         }
         
         bool operator != (const rangef & in_otherRange) const {
             return min != in_otherRange.min || max != in_otherRange.max;
-        }
-        
-        rangef & move_up(float in_offset) {
-            min += in_offset;
-            max += in_offset;
-            return *this;
-        }
-
-        rangef & move_down(float in_offset) {
-            min -= in_offset;
-            max -= in_offset;
-            return *this;
-        }
-        
-        rangef & grow(float in_offset) {
-            min -= in_offset;
-            max += in_offset;
-            return *this;
-        }
-
-        rangef & shrink(float in_offset) {
-            min += in_offset;
-            max -= in_offset;
-            return *this;
-        }
-        
-        rangef & scale(float in_scalar) {
-            float l_center = (max + min) * 0.5f;
-            float l_newHalfLength = (max - min) * in_scalar * 0.5f;
-            min = l_center - l_newHalfLength;
-            max = l_center + l_newHalfLength;
-            return *this;
-        }
-        
-        rangef & flip() {
-            std::swap(min, max);
-            return *this;
         }
         
         bool empty() const {
@@ -380,6 +345,44 @@ namespace atl
             };
         }
         
+#pragma mark Mutating Operations
+        rangef & move_up(float in_offset) {
+            min += in_offset;
+            max += in_offset;
+            return *this;
+        }
+        
+        rangef & move_down(float in_offset) {
+            min -= in_offset;
+            max -= in_offset;
+            return *this;
+        }
+        
+        rangef & grow(float in_offset) {
+            min -= in_offset;
+            max += in_offset;
+            return *this;
+        }
+        
+        rangef & shrink(float in_offset) {
+            min += in_offset;
+            max -= in_offset;
+            return *this;
+        }
+        
+        rangef & scale(float in_scalar) {
+            float l_center = (max + min) * 0.5f;
+            float l_newHalfLength = (max - min) * in_scalar * 0.5f;
+            min = l_center - l_newHalfLength;
+            max = l_center + l_newHalfLength;
+            return *this;
+        }
+        
+        rangef & flip() {
+            std::swap(min, max);
+            return *this;
+        }
+        
         rangef & include(float in_value) {
             min = std::min(min, in_value);
             max = std::max(max, in_value);
@@ -399,9 +402,11 @@ namespace atl
         }
     };
     
+#pragma mark - box2f
     class box2f
     {
     public:
+#pragma mark Members
         union {
             struct {
                 float l, r, b, t;
@@ -411,6 +416,7 @@ namespace atl
             };
         };
         
+#pragma mark Constructors
         box2f(const rangef & in_x, const rangef & in_y) :
         x(in_x),
         y(in_y)
@@ -430,29 +436,32 @@ namespace atl
         l(in_pt.x)
         {}
         
-        box2f(const atl::point2f & in_ptA, const atl::point2f & in_ptB)
+        template <typename Iterator>
+        box2f(Iterator in_itr, Iterator in_end)
         {
-            if(in_ptA.x <= in_ptB.x)
+            l = r = in_itr->x;
+            b = t = in_itr->y;
+            while(++in_itr != in_end)
             {
-                l = in_ptA.x;
-                r = in_ptB.x;
-            }
-            else
-            {
-                l = in_ptB.x;
-                r = in_ptA.x;
-            }
-            if(in_ptA.y <= in_ptB.y)
-            {
-                b = in_ptA.y;
-                t = in_ptB.y;
-            }
-            else
-            {
-                b = in_ptB.y;
-                t = in_ptA.y;
+                l = std::min(l, in_itr->x);
+                b = std::min(b, in_itr->y);
+                r = std::max(r, in_itr->x);
+                t = std::max(t, in_itr->y);
             }
         }
+        
+        box2f(const std::initializer_list<atl::point2f> & in_ptList) :
+        box2f(in_ptList.begin(), in_ptList.end())
+        {}
+
+        box2f(const std::vector<atl::point2f> & in_ptList) :
+        box2f(in_ptList.begin(), in_ptList.end())
+        {}
+
+        template <int N>
+        box2f(const std::array<atl::point2f, N> & in_ptList) :
+        box2f(in_ptList.begin(), in_ptList.end())
+        {}
         
         box2f(const point2f & in_corner, const size2f & in_size, anchoring in_anchoring)
         {
@@ -866,4 +875,62 @@ namespace atl
                     l != in_otherBounds.l);
         }
     };
+    
+    inline box2f point2f::get_box(const atl::size2f & in_size, anchoring in_anchoring)
+    {
+        box2f l_result;
+        switch(in_anchoring)
+        {
+            case anchoring::top_left:
+            case anchoring::center_left:
+            case anchoring::bottom_left:
+            {
+                l_result.l = x;
+                l_result.r = x + in_size.w;
+                break;
+            }
+            case anchoring::top_center:
+            case anchoring::centered:
+            case anchoring::bottom_center:
+            {
+                float l_w = in_size.w * 0.5f;
+                l_result.l = x - l_w;
+                l_result.r = x + l_w;
+                break;
+            }
+            case anchoring::top_right:
+            case anchoring::center_right:
+            case anchoring::bottom_right:
+            {
+                l_result.r = x;
+                l_result.l = x - in_size.w;
+                break;
+            }
+        }
+        switch(in_anchoring)
+        {
+            case anchoring::top_left:
+            case anchoring::top_center:
+            case anchoring::top_right:
+                l_result.t = y;
+                l_result.b = y - in_size.h;
+                break;
+            case anchoring::center_left:
+            case anchoring::centered:
+            case anchoring::center_right:
+            {
+                float l_h = in_size.h * 0.5f;
+                l_result.b = y - l_h;
+                l_result.t = y + l_h;
+                break;
+            }
+            case anchoring::bottom_left:
+            case anchoring::bottom_center:
+            case anchoring::bottom_right:
+                l_result.b = y;
+                l_result.t = y + in_size.h;
+                break;
+        }
+        return l_result;
+    }
 }
