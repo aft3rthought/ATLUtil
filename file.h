@@ -2,37 +2,29 @@
 
 #pragma once
 
-#include <limits>
+#include <fstream>
+#include <string>
+#include <vector>
 
 namespace atl
 {
-    /*
-     num_max
-     Convenience function to get std::numeric_limits(decltype(num))::max
-     */
-    template <class T>
-    constexpr T num_max(const T & num)
+    std::vector<uint8_t> read_bytes(const std::string & filename)
     {
-        return std::numeric_limits<T>::max();
-    }
-    
-    /*
-     num_is_max
-     Convenience function to test if num is equal to std::numeric_limits(decltype(num))::max
-    */
-    template <class T>
-    constexpr bool num_is_max(const T & num)
-    {
-        return num == num_max(num);
-    }
-    
-    /*
-     set_num_max
-     Convenience function to set num to the value std::numeric_limits(decltype(num))::max
-     */
-    template <class T>
-    void set_num_max(T & num)
-    {
-        num = num_max(num);
+        std::vector<uint8_t> result;
+        std::ifstream file(filename.c_str(), std::ios::in);
+        
+        if(file.good())
+        {
+            std::streamsize size = 0;
+            if(file.seekg(0, std::ios::end).good())
+                size = file.tellg();
+            
+            if(file.seekg(0, std::ios::beg).good())
+                size -= file.tellg();
+            
+            result.resize(size);
+            file.read((char *)result.data(), size);
+        }
+        return result;
     }
 }
