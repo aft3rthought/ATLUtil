@@ -7,7 +7,7 @@
 
 namespace atl
 {
-    std::vector<std::string> split_string(const std::string & in_string, const std::string & in_separator)
+    inline std::vector<std::string> split_string(const std::string & in_string, const std::string & in_separator)
     {
         std::vector<std::string> result;
         
@@ -44,14 +44,31 @@ namespace atl
         return result;
     }
     
-    std::string trim_string(const std::string & in_string)
+    inline bool is_whitespace(char c)
+    {
+        return (c == ' ' || c == '\t' || c == '\n');
+    }
+    
+    inline std::string trim_quotes(const std::string & string)
+    {
+        auto stringSize = string.size();
+        char firstChar = string[0];
+        char lastChar = string[stringSize - 1];
+        if((firstChar == '\"' && lastChar == '\"') ||
+           (firstChar == '\'' && lastChar == '\''))
+        {
+            return string.substr(1, stringSize - 2);
+        }
+        return string;
+    }
+
+    inline std::string trim_whitespace(const std::string & in_string)
     {
         auto chunkBeginItr = in_string.end();
         auto chunkEndItr = in_string.end();
         for(auto stringItr = in_string.begin(); stringItr != in_string.end(); stringItr++)
         {
-            char val = *stringItr;
-            if((val == ' ' || val == '\t' || val == '\n') == false)
+            if(!is_whitespace(*stringItr))
             {
                 if(chunkBeginItr == in_string.end())
                     chunkBeginItr = stringItr;
@@ -61,10 +78,30 @@ namespace atl
         return std::string(chunkBeginItr, chunkEndItr);
     }
     
-    std::string num_string(int32_t number)
+    inline std::string num_string(int32_t number)
     {
         char buff[16];
         snprintf(buff, sizeof(buff), "%d", number);
         return buff;
+    }
+    
+    inline std::string get_directory(const std::string & string)
+    {
+        auto last_slash_pos = string.find_last_of('/');
+        if(last_slash_pos != std::string::npos)
+            return string.substr(0, last_slash_pos + 1);
+        return "";
+    }
+    
+    inline std::string get_file_name(const std::string & string, bool includeExtension)
+    {
+        auto last_slash_pos = string.find_last_of('/');
+        std::string filename = last_slash_pos != std::string::npos ? string.substr(last_slash_pos + 1, std::string::npos) : string;
+        if(!includeExtension)
+        {
+            auto first_period_pos = filename.find_first_of('.');
+            filename = first_period_pos != std::string::npos ? filename.substr(0, first_period_pos) : filename;
+        }
+        return filename;
     }
 }
