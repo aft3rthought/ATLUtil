@@ -2,98 +2,68 @@
 
 #pragma once
 
-#include "file.h"
-#include "serialize.h"
-#include "map_util.h"
-#include "numeric_casts.h"
-#include <map>
+#include "string_util.h"
 
 namespace atl
 {
-    class command_line_parameters
+    class json_tree_node
     {
     public:
-        command_line_parameters(int in_argc, const char * in_argv[], const std::vector<std::string> & in_expectedConfigs)
+        json_tree_node(const std::string & in_text) :
+        internal_is_valid(false)
         {
-            std::map<std::string, std::string> args;
-            {
-                std::string arg0(in_argv[0]);
-                args["DEFAULT_CWD"] = arg0.substr(0, arg0.find_last_of('/')+1);
-            }
-            for(int argIdx = 1; argIdx < in_argc; argIdx++)
-                gParseArg(in_argv[argIdx], &args);
+            auto l_headItr = in_text.begin();
+            auto l_tailItr = in_text.rbegin();
+            while(l_headItr != in_text.end() && atl::is_whitespace(*l_headItr)) { l_headItr++; }
+            while(l_tailItr != in_text.rend() && atl::is_whitespace(*l_tailItr)) { l_tailItr++; }
             
-            if(atl::map_has(args, {"CONFIG"}))
+            if(l_headItr != in_text.end() && l_tailItr != in_text.rend())
             {
-                std::string configFile = args.at("CONFIG");
-                std::string directory, file, outputFile;
-                auto data = atl::read_bytes(configFile);
-                if(data.empty())
+                char l_firstChar = *l_headItr;
+                char l_lastChar = *l_tailItr;
+                if(l_firstChar == '{' && l_lastChar == '}')
                 {
-                    printf("Couldn't load CONFIG file: %s\n", configFile.c_str());
-                }
-                else
-                {
-                    args["CONFIG_DIRECTORY"] = configFile.substr(0, configFile.find_last_of('/')+1);
-                    gParseConfig(data, &args);
-                }
-            }
-            if(atl::map_has(args, {"OP"}))
-            {
-                
-            }
-            else
-            {
-                printf("Missing required parameter \"OP\"\n");
-            }
-        }
-        
-        bool parse_arg(const std::string & arg)
-        {
-            auto firstItr = arg.find_first_of('=');
-            if(firstItr != arg.npos)
-            {
-                auto key = arg.substr(0, firstItr);
-                auto val = arg.substr(firstItr + 1, arg.size());
-                (*parsed)[key] = val;
-                return true;
-            }
-            return false;
-        }
-        
-        void parse_config_file(const std::vector<uint8_t> & file, std::map<std::string, std::string> * parsed)
-        {
-            bool readingKey = true;
-            std::string nextKey;
-            std::string nextValue;
-            atl::bits_in bytes(file.data(), atl::narrow_size_t_to_int(file.size()));
-            while(bytes.has_bytes())
-            {
-                char next = bytes.read_byte();
-                if(next == '=')
-                {
-                    readingKey = false;
-                }
-                else if(next == '\n')
-                {
-                    if(!nextKey.empty() && !nextValue.empty())
-                        (*parsed)[nextKey] = nextValue;
+                    l_tailPtr--;
+                    l_headPtr++;
                     
-                    readingKey = true;
-                    nextKey = "";
-                    nextValue = "";
+                    // parse list of k:v pairs
                 }
-                else
+                else if(l_firstChar == '[' && l_lastChar == ']')
                 {
-                    if(readingKey)
-                        nextKey += next;
-                    else
-                        nextValue += next;
+                    l_tailPtr--;
+                    l_headPtr++;
+                    
+                    // parse comma separated list
                 }
             }
         }
         
-        std::map<std::string, std::string> parameters;
-        std::vector<std::string> errors;
+    private:
+        bool internal_is_valid;
+        
+        struct internal_parse_node
+        {
+            enum class Token {
+                
+            };
+        };
+    };
+    
+    class json_leaf_node
+    {
+    public:
+        json_leaf_node(const std::string & in_text)
+        {
+            // 
+        }
+        
+    private:
+        bool internal_checked_string;
+        bool internal_checked_numeric;
+        bool internal_checked_boolean;
+        
+        bool internal_valid_string;
+        bool internal_valid_numeric;
+        bool internal_valid_boolean;
     };
 }
