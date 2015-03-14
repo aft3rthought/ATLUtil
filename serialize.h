@@ -244,6 +244,17 @@ namespace atl
             return _dataPointer;
         }
         
+        void skip_bits(int32_t in_amount)
+        {
+            auto new_offset = _bitOffset + in_amount;
+            int32_t num_bytes = new_offset / 8;
+            if(_bytesRemaining < num_bytes)
+                throw std::logic_error("out of range read");
+            _dataPointer += num_bytes;
+            _bitOffset = new_offset % 8;
+            
+        }
+        
         void advance_data_pointer(int32_t in_amount)
         {
             if(_bytesRemaining < in_amount)
