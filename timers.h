@@ -37,15 +37,17 @@ namespace atl
             advance(in_amt * 1.f / in_duration);
         }
         
-        void advance_and_loop(float in_amt)
+        bool advance_and_loop(float in_amt)
         {
             _value += in_amt;
+            bool looped = _value >= 1.f;
             _value -= floorf(_value);
+            return looped;
         }
         
-        void tick_and_loop(float in_amt, float in_duration)
+        bool tick_and_loop(float in_amt, float in_duration)
         {
-            advance_and_loop(in_amt * 1.f / in_duration);
+            return advance_and_loop(in_amt * 1.f / in_duration);
         }
         
         float map(float in_valAtBegin, float in_valAtEnd) const
