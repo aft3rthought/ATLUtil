@@ -5,6 +5,8 @@
 #include "array_util.h"
 #include "basic_math.h"
 #include <cmath>
+#include <vector>
+#include <initializer_list>
 
 namespace atl
 {
@@ -84,6 +86,18 @@ namespace atl
         T & pick(T(&in_array)[N]) const
         {
             return in_array[to_int((int)c_array_len(in_array))];
+        }
+
+        template <typename T>
+        const T & pick(const std::vector<T> & vector)
+        {
+            return vector.at(to_int(vector.size() - 1));
+        }
+        
+        template <typename T>
+        const T & pick(std::initializer_list<T> list)
+        {
+            return *(list.begin() + to_int(list.size() - 1));
         }
     };
     
