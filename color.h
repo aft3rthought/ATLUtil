@@ -16,6 +16,10 @@ namespace atl
         {}
     };
     
+    inline color_alpha operator * (const color_alpha & lhs, const color_alpha & rhs) {
+        return color_alpha(lhs.alpha * rhs.alpha);
+    }
+    
     class color_gray
     {
     public:
@@ -37,6 +41,10 @@ namespace atl
         alpha((float)in_alpha * (1.f / 255.f))
         {}
     };
+    
+    inline color_gray operator * (const color_gray & lhs, const color_gray & rhs) {
+        return color_gray(lhs.value * rhs.value, lhs.alpha * rhs.alpha);
+    }
     
     class color
     {
@@ -115,6 +123,18 @@ namespace atl
             a = interpf(a, in_to.a, in_val);
         }
     };
+    
+    inline color operator * (const color & lhs, const color & rhs) {
+        return color(lhs.r * rhs.r, lhs.g * rhs.g, lhs.b * rhs.b, lhs.a * rhs.a);
+    }
+    
+    inline color operator + (const color & lhs, const color & rhs) {
+        return color(lhs.r + rhs.r, lhs.g + rhs.g, lhs.b + rhs.b, lhs.a + rhs.a);
+    }
+    
+    inline color operator * (const color & lhs, const float & rhs) {
+        return color(lhs.r * rhs, lhs.g * rhs, lhs.b * rhs, lhs.a * rhs);
+    }
     
     class color_premul
     {
