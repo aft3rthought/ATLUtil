@@ -84,22 +84,27 @@ namespace atl
             return active() ? _value * in_frames : 0;
         }
         
+        size_t to_size_t(size_t in_frames) const
+        {
+            return active() ? _value * in_frames : 0;
+        }
+        
         template <typename T, size_t N>
         T & pick(T(&in_array)[N]) const
         {
-            return in_array[to_int((int)c_array_len(in_array))];
+            return in_array[to_size_t((int)c_array_len(in_array))];
         }
 
         template <typename T>
         const T & pick(const std::vector<T> & vector)
         {
-            return vector.at(to_int(vector.size() - 1));
+            return vector.at(to_size_t(vector.size() - 1));
         }
         
         template <typename T>
         const T & pick(std::initializer_list<T> list)
         {
-            return *(list.begin() + to_int(list.size() - 1));
+            return *(list.begin() + to_size_t(list.size() - 1));
         }
     };
     
