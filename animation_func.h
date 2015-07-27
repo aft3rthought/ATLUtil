@@ -19,7 +19,7 @@ namespace atl
         
         keyframe(const float & in_t, const KeyframeType & in_v) : t(in_t), v(in_v) {};
         
-        KeyframeType interpolateTo(float in_t, keyframe & in_next) {
+        KeyframeType interpolateTo(float in_t, const keyframe & in_next) const {
             float l_delta = in_next.t - t;
             float l_pct = (in_t - t) / l_delta;
             auto l_result = v;
@@ -33,13 +33,13 @@ namespace atl
     public:
         float t, v;
         
-        float interpolateTo(float in_t, keyframe & in_next) {
+        float interpolateTo(float in_t, const keyframe & in_next) const {
             return atl::mapf_unclamped(in_t, t, in_next.t, v, in_next.v);
         }
     };
     
     template <typename KeyframeType, size_t N>
-    KeyframeType map_keyframe(float t, keyframe<KeyframeType>(&keyframes)[N])
+    KeyframeType map_keyframe(float t, const keyframe<KeyframeType>(&keyframes)[N])
     {
         auto c = keyframes;
         auto end = c + N;
