@@ -441,6 +441,9 @@ namespace atl
             in_stream.write((const char *)_data.data(), _data.size());
         }
         
+        const unsigned char * bytes() const { return _data.data(); }
+        int32_t numBytes() const { return (int32_t)_data.size(); }
+        
     private:
         std::vector<unsigned char> _data;
         int32_t _bitOffset;
