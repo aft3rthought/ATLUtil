@@ -3,9 +3,13 @@
 #pragma once
 
 #include <limits>
+#include <cmath>
 
 namespace atl
 {
+    const static float sin_highest_value_phase = M_PI / 2.f;
+    const static float sin_lowest_value_phase = M_PI * 3.f / 4.f;
+    
     /*
      num_max
      Convenience function to get std::numeric_limits(decltype(num))::max

@@ -102,6 +102,14 @@ namespace atl
             vector_length(float in_x, float in_y) :
             squared_value(in_x * in_x + in_y * in_y) {}
             
+            bool operator <(float in_lengthInNonSquaredSpace) const {
+                return squared_value < in_lengthInNonSquaredSpace * in_lengthInNonSquaredSpace;
+            }
+            
+            bool operator >(float in_lengthInNonSquaredSpace) const {
+                return squared_value > in_lengthInNonSquaredSpace * in_lengthInNonSquaredSpace;
+            }
+            
             bool operator <(const vector_length & in_otherLength) const {
                 return squared_value < in_otherLength.squared_value;
             }
@@ -752,6 +760,22 @@ namespace atl
             x.interpolate(in_to.x, in_t);
             y.interpolate(in_to.y, in_t);
             return *this;
+        }
+        
+        box2f split_right(float in_ratio)
+        {
+            float l_mid_point = l + (r - l) * in_ratio;
+            box2f l_result(t, r, b, l_mid_point);
+            r = l_mid_point;
+            return l_result;
+        }
+        
+        box2f split_down(float in_ratio)
+        {
+            float l_mid_point = t + (b - t) * in_ratio;
+            box2f l_result(l_mid_point, r, b, l);
+            b = l_mid_point;
+            return l_result;
         }
     };
     

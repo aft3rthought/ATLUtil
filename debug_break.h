@@ -4,6 +4,8 @@
 #define SGFatalError(msg) { printf(msg); __builtin_trap(); }
 #define SGDebugBreakIf(cond, msg) if(cond) { printf(msg); __builtin_trap(); }
 #define SGDebugBreak(msg) { printf(msg); __builtin_trap(); }
+#define ATLAssertFatal(cond, msg) if(cond) { printf("%s\n", msg); __builtin_trap(); }
+#define ATLAssertWarn(cond, msg) if(cond) { printf("%s\n", msg); __builtin_trap(); }
 #endif
 
 #ifdef PLATFORM_IOS

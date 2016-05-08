@@ -122,6 +122,14 @@ namespace atl
             b = interpf(b, in_to.b, in_val);
             a = interpf(a, in_to.a, in_val);
         }
+        
+        color & operator +=(const color & otherColor) {
+            r += otherColor.r;
+            g += otherColor.g;
+            b += otherColor.b;
+            a += otherColor.a;
+            return *this;
+        }
     };
     
     inline color operator * (const color & lhs, const color & rhs) {
@@ -196,5 +204,28 @@ namespace atl
         bool operator !=(const color_premul & in_otherColor) {
             return !((*this) == in_otherColor);
         }
+        
+        color_premul & operator *=(const float & in_scalar) {
+            r *= in_scalar;
+            g *= in_scalar;
+            b *= in_scalar;
+            a *= in_scalar;
+            return *this;
+        }
+        
+        color_premul & operator +=(const color_premul & otherColor) {
+            r += otherColor.r;
+            g += otherColor.g;
+            b += otherColor.b;
+            a += otherColor.a;
+            return *this;
+        }
+        
+        color_premul operator + (const color_premul & otherColor) {
+            return *this += otherColor;
+        }
     };
+    
+    static const atl::color_gray color_black = atl::color_gray(0.f);
+    static const atl::color_gray color_white = atl::color_gray(1.f);
 }

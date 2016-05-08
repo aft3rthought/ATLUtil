@@ -48,6 +48,7 @@ namespace atl
         }
         
         bool has_bytes() const { return _bytesRemaining > 0; }
+        int32_t bytes_remaining() const { return _bytesRemaining; }
         
         void read_bits(unsigned char * in_data, int32_t in_numBits)
         {
