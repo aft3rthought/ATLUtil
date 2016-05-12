@@ -60,7 +60,7 @@ atl::matrix4f atl::matrix4f::getInverse() const
     
     det = a[0] * inv[0] + a[1] * inv[4] + a[2] * inv[8] + a[3] * inv[12];
     
-    det = 1.0 / det;
+    det = 1.0f / det;
     
     return {
         inv[0] * det, inv[1] * det, inv[2] * det, inv[3] * det,
@@ -102,7 +102,7 @@ atl::matrix4f atl::matrix4f::getInverseAffine() const
     
     float det = a11 * inv[0] + a21 * inv[1] + a31 * inv[2];
     
-    det = 1.0 / det;
+    det = 1.0f / det;
     
     inv[0] *= det;
     inv[1] *= det;

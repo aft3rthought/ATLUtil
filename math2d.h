@@ -11,6 +11,25 @@
 
 namespace atl
 {
+	namespace numbers {
+		/*
+#define M_LOG2E    1.44269504088896340736   // log2(e)
+#define M_LOG10E   0.434294481903251827651  // log10(e)
+#define M_LN2      0.693147180559945309417  // ln(2)
+#define M_LN10     2.30258509299404568402   // ln(10)
+#define M_1_PI     0.318309886183790671538  // 1/pi
+#define M_2_PI     0.636619772367581343076  // 2/pi
+#define M_2_SQRTPI 1.12837916709551257390   // 2/sqrt(pi)
+#define M_SQRT1_2  0.707106781186547524401  // 1/sqrt(2)
+*/
+		static const float sqrt_2_f = 1.41421356237309504880f;
+		static const float e_f = 2.71828182845904523536f;
+		static const float two_pi_f = 2.f * 3.14159265358979323846f;
+		static const float pi_f = 3.14159265358979323846f;
+		static const float half_pi_f = 1.57079632679489661923f;
+		static const float quarter_pi_f = 0.785398163397448309616f;
+	}
+
     enum class anchoring
     {
         top_left,
@@ -240,7 +259,6 @@ namespace atl
         box2f get_box(const atl::size2f & in_size, anchoring in_anchoring);
     };
 
-#pragma mark - circlef
     class circlef
     {
     public:
@@ -285,14 +303,11 @@ namespace atl
         }
     };
     
-#pragma mark - rangef
     class rangef
     {
     public:
-#pragma mark Members
         float min, max;
         
-#pragma mark Constructors
         rangef(float in_min, float in_max) :
         min(in_min),
         max(in_max)
@@ -301,11 +316,9 @@ namespace atl
         rangef()
         {}
         
-#pragma mark Static properties
         const static rangef Max;
         const static rangef InvertedMax;
         
-#pragma mark Queries
         bool operator == (const rangef & in_otherRange) const {
             return min == in_otherRange.min && max == in_otherRange.max;
         }
@@ -353,7 +366,6 @@ namespace atl
             };
         }
         
-#pragma mark Mutating Operations
         rangef & move_up(float in_offset) {
             min += in_offset;
             max += in_offset;
@@ -410,11 +422,9 @@ namespace atl
         }
     };
     
-#pragma mark - box2f
     class box2f
     {
     public:
-#pragma mark Members
         union {
             struct {
                 float l, r, b, t;
@@ -424,7 +434,6 @@ namespace atl
             };
         };
         
-#pragma mark Constructors
         box2f(const rangef & in_x, const rangef & in_y) :
         x(in_x),
         y(in_y)

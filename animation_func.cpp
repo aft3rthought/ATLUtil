@@ -6,12 +6,12 @@
 
 float atl::ease_in_style1(const float in_val, const float in_bounce)
 {
-    return in_val * in_val + sinf(in_val * in_val * M_PI) * in_bounce;
+    return in_val * in_val + sinf(in_val * in_val * atl::numbers::pi_f) * in_bounce;
 }
 
 float atl::ease_in_style2(const float in_val)
 {
-    float cos = cosf(in_val * M_PI / 2.f);
+    float cos = cosf(in_val * atl::numbers::half_pi_f);
     return 1.f - (cos * cos * cos * cos);
 }
 

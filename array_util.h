@@ -41,4 +41,13 @@ namespace atl
     {
         return in_array[index % in_array.size()];
     }
+
+	/*
+	c_array_byte_length: Returns the array's size in bytes.
+	*/
+	template <typename T, size_t N>
+	auto c_array_byte_length(T(&in_array)[N])
+	{
+		return sizeof(T) * N;
+	}
 }
