@@ -14,6 +14,7 @@ namespace atl
         auto chunkBeginItr = in_string.begin();
         auto chunkEndItr = in_string.begin();
         auto sepItr = in_separator.begin();
+        auto sepEnd = in_separator.end();
         bool matchingSeparator = false;
         for(auto stringItr = in_string.begin(); stringItr != in_string.end(); stringItr++)
         {
@@ -22,8 +23,11 @@ namespace atl
                 if(!matchingSeparator)
                     matchingSeparator = true;
                 sepItr++;
-                if(sepItr == in_separator.end())
+                if(sepItr == sepEnd)
                 {
+                    matchingSeparator = false;
+                    sepItr = in_separator.begin();
+
                     if(chunkBeginItr != chunkEndItr)
                         result.emplace_back(chunkBeginItr, chunkEndItr);
                     
