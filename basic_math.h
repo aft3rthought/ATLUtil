@@ -5,16 +5,6 @@
 namespace atl
 {
     /*
-     int_div_up
-     Divide an integer by an integer, rounding up
-     */
-    template <class T>
-    constexpr T int_div_up(T numerator, T denominator)
-    {
-        return (numerator - 1) / numerator + 1;
-    }
-    
-    /*
      clamp
      Clamp value to the range [targetMin, targetMax]
      */
