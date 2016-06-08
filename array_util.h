@@ -55,7 +55,7 @@ namespace atl
 	c_array_byte_length: Returns the array's size in bytes.
 	*/
 	template <typename T, size_t N>
-	size_t c_array_byte_length(T(&in_array)[N])
+	size_t c_array_byte_length(T(&)[N])
 	{
 		return sizeof(T) * N;
 	}

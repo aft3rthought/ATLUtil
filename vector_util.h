@@ -5,8 +5,11 @@
 #include <vector>
 #include <algorithm>
 
+#define atl_begin_end(container) container.begin(), container.end()
+
 namespace atl
 {
+    
     template <typename VectorType, typename IteratorType, typename T>
     struct base_vector_search_result
     {
@@ -122,7 +125,7 @@ namespace atl
      vector_erase_all_equal_to: Call erase on all iterators where == returns true. Returns true if the array was modified.
      */
     template <typename T, typename Comparator, typename Function>
-    bool vector_erase_all_matching(std::vector<T> & vector, Comparator comparator, Function function)
+    bool vector_erase_all_matching(std::vector<T> & vector, Comparator comparator)
     {
         bool result = false;
         auto itr = vector.begin();

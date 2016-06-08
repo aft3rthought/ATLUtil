@@ -12,7 +12,7 @@ namespace atl
      Convenience function to get std::numeric_limits(decltype(num))::max
      */
     template <class T>
-    constexpr T num_max(const T & num)
+    constexpr T num_max(const T &)
     {
         return std::numeric_limits<T>::max();
     }

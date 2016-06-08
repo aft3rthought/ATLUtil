@@ -6,15 +6,16 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include "ATLUtil/numeric_util.h"
 
 namespace atl
 {
     class bits_common
     {
     public:
-        uint8_t bits_required_for_uint32(uint32_t in_numValuesInRange)
+        int bits_required_for_uint32(uint32_t in_numValuesInRange)
         {
-            uint8_t bitsRequired = 0;
+            int bitsRequired = 0;
             while(in_numValuesInRange > 0)
             {
                 in_numValuesInRange = in_numValuesInRange >> 1;
@@ -23,9 +24,9 @@ namespace atl
             return bitsRequired;
         }
         
-        uint8_t bits_required_for_uint64(uint64_t in_numValuesInRange)
+        int bits_required_for_uint64(uint64_t in_numValuesInRange)
         {
-            uint8_t bitsRequired = 0;
+            int bitsRequired = 0;
             while(in_numValuesInRange > 0)
             {
                 in_numValuesInRange = in_numValuesInRange >> 1;
@@ -167,7 +168,7 @@ namespace atl
             unsigned char nextByte = read_byte();
             while(nextByte != 0)
             {
-                result += nextByte;
+                result += atl::ignore_sign<char>(nextByte);
                 nextByte = read_byte();
             }
             return result;
@@ -184,10 +185,9 @@ namespace atl
                 if(in_max < in_min)
                     throw std::logic_error("invalid range for int");
                 
-                uint32_t numValuesInRange = in_max - in_min;
-                uint32_t bitsRequired = bits_required_for_uint32(numValuesInRange);
+                auto bitsRequired = bits_required_for_uint32(atl::ignore_sign<uint32_t>(in_max - in_min));
                 
-                int32_t result = 0;
+                auto result = (int)0;
                 read_bits((unsigned char *)&result, bitsRequired);
                 return result + in_min;
             }
@@ -361,7 +361,7 @@ namespace atl
         
         void append_string(const std::string & in_string)
         {
-            append_bytes((unsigned char *)in_string.data(), (uint32_t)in_string.length() * (uint32_t)sizeof(char));
+            append_bytes((unsigned char *)in_string.data(), atl::integer<int32_t>(in_string.length() * sizeof(char)));
             append_byte(0);
         }
         
@@ -375,8 +375,8 @@ namespace atl
                 if(in_value < in_min || in_value > in_max)
                     throw std::logic_error("value not in range");
                 
-                uint32_t bitsRequired = bits_required_for_uint32(in_max - in_min);
-                int32_t valueOffsetInRange = in_value - in_min;
+                auto bitsRequired = bits_required_for_uint32(atl::integer<uint32_t>(in_max - in_min));
+                auto valueOffsetInRange = in_value - in_min;
                 append_bits((unsigned char *)&valueOffsetInRange, bitsRequired);
             }
         }
@@ -440,7 +440,7 @@ namespace atl
         
         void write_to_stream(std::ostream & in_stream) const
         {
-            in_stream.write((const char *)_data.data(), _data.size());
+            in_stream.write((const char *)_data.data(), atl::integer<std::streamsize>(_data.size()));
         }
         
         const unsigned char * bytes() const { return _data.data(); }

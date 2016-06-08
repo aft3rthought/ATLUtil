@@ -81,12 +81,12 @@ namespace atl
         
         int to_int(int in_frames) const
         {
-            return active() ? _value * in_frames : 0;
+            return active() ? (int)(_value * (float)in_frames) : (int)0;
         }
         
         size_t to_size_t(size_t in_frames) const
         {
-            return active() ? _value * in_frames : 0;
+            return active() ? (size_t)(_value * (size_t)in_frames) : (size_t)0;
         }
         
         template <typename T, size_t N>
