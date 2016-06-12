@@ -5,7 +5,7 @@
 #include "ATLUtil/debug_break.h"
 #include <limits>
 
-#define atl_numeric_cast_assert atl_assert_fatal
+#define atl_numeric_cast_assert atl_fatal_assert
 
 namespace atl
 {
@@ -45,5 +45,19 @@ namespace atl
     {
         atl_numeric_cast_assert(input_value >= 0, "Signed to unsigned conversion: Input value is negative");
         return (unsigned long)input_value;
+    }
+    
+    template <>
+    inline unsigned long integer(long input_value)
+    {
+        atl_numeric_cast_assert(input_value >= 0, "Signed to unsigned conversion: Input value is negative");
+        return (unsigned long)input_value;
+    }
+    
+    template <>
+    inline long integer(unsigned long input_value)
+    {
+        atl_numeric_cast_assert(input_value <= std::numeric_limits<long>::max(), "Unsigned to signed conversion: Input value is too large");
+        return (long)input_value;
     }
 }
