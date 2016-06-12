@@ -50,14 +50,14 @@ namespace atl
         void emplace_back(emplace_arguments_list... in_arguments)
         {
             atl_fatal_assert(internal_count < num_elements, "emplace_back called when space is full");
-            new (internal_end_element()) element_type(std::forward<emplace_arguments_list>(in_arguments)...);
+            new (end()) element_type(std::forward<emplace_arguments_list>(in_arguments)...);
             ++internal_count;
         }
         
         void pop_back()
         {
             atl_fatal_assert(internal_count > 0, "pop_back called on empty array");
-            internal_end_element()->~element_type();
+            end()->~element_type();
             --internal_count;
         }
         
@@ -68,12 +68,12 @@ namespace atl
             internal_count = 0;
         }
         
-        size_t size() noexcept
+        size_t count() const noexcept
         {
             return internal_count;
         }
         
-        bool empty() noexcept
+        bool empty() const noexcept
         {
             return internal_count == 0;
         }
@@ -87,7 +87,7 @@ namespace atl
             while(l_input != in_input_end)
             {
                 atl_fatal_assert(l_current_end != l_internal_max_end, "insert contained too many elements for storage");
-                new (internal_end_element()) element_type(*l_input);
+                new (end()) element_type(*l_input);
                 ++internal_count;
                 l_current_end++;
                 l_input++;
@@ -95,13 +95,36 @@ namespace atl
             return (in_input_end - in_input_begin) - (l_input - in_input_begin);
         }
         
-        iterator begin() { return reinterpret_cast<element_type*>(internal_storage); }
-        iterator end() { return begin() + internal_count; }
-        const_iterator begin() const { return reinterpret_cast<const element_type*>(internal_storage); }
-        const_iterator end() const { return begin() + internal_count; }
+        iterator erase(iterator in_element_to_remove)
+        {
+            auto l_end = end();
+            atl_fatal_assert(in_element_to_remove >= begin() && in_element_to_remove < l_end, "erase iterator out of bounds");
+            auto l_next = in_element_to_remove + 1;
+            in_element_to_remove->~element_type();
+            internal_count--;
+            std::move(l_next, l_end, in_element_to_remove);
+            return iterator(in_element_to_remove);
+        }
+        
+        iterator erase_fast(iterator in_element_to_remove)
+        {
+            auto l_end = end();
+            atl_fatal_assert(in_element_to_remove >= begin() && in_element_to_remove < l_end, "erase_fast iterator out of bounds");
+            auto l_last = l_end - 1;
+            in_element_to_remove->~element_type();
+            internal_count--;
+            if(l_last != in_element_to_remove)
+                *in_element_to_remove = *l_last;
+            return iterator(in_element_to_remove);
+        }
+        
+        iterator begin() noexcept { return reinterpret_cast<element_type*>(internal_storage); }
+        iterator end() noexcept { return begin() + internal_count; }
+        
+        const_iterator begin() const noexcept { return reinterpret_cast<const element_type*>(internal_storage); }
+        const_iterator end() const noexcept { return begin() + internal_count; }
 
     private:
-        element_type * internal_end_element() { return begin() + internal_count; }
         element_type const * internal_max_end() const { return begin() + num_elements; }
         const static size_t internal_element_size = sizeof(element_type);
         const static size_t internal_num_storage_bytes = internal_element_size * num_elements;
