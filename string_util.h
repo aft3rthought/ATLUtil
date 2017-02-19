@@ -88,6 +88,92 @@ namespace atl
         snprintf(buff, sizeof(buff), "%d", number);
         return buff;
     }
+
+    template <typename integer_type>
+    constexpr size_t log10(integer_type number) { return number > 10 ? 1 + log10(number / 10) : 0; }
+    
+    template <typename integer_type>
+    constexpr size_t max_digits_for_printing_integer_type() { return (std::is_signed<integer_type>::value ? 1 : 0) + log10(std::numeric_limits<integer_type>::max()) + 1; }
+    
+    namespace detail
+    {
+        template <typename integer_type>
+        char * print_sign(integer_type, char * buffer_ptr, typename std::enable_if<std::is_unsigned<integer_type>::value>::type* = 0)
+        {
+            return buffer_ptr;
+        }
+        
+        template <typename integer_type>
+        char * print_sign(integer_type number, char * buffer_ptr, typename std::enable_if<std::is_signed<integer_type>::value>::type* = 0)
+        {
+            if(number < 0)
+            {
+                *buffer_ptr = '-';
+                buffer_ptr++;
+            }
+            return buffer_ptr;
+        }
+    }
+    
+#warning TODO: support size_t digits before zero, a decimal character, and a flag for always show below zero/only show if non-zero
+    template <typename integer_type, size_t separator_spacing, char separator_character>
+    struct printed_integer
+    {
+        static constexpr size_t digits_for_type_alone() { return max_digits_for_printing_integer_type<integer_type>(); }
+        char buffer[digits_for_type_alone() + ((separator_spacing > 0) ? (digits_for_type_alone() / separator_spacing) : 0) + 1];
+        
+        printed_integer(integer_type number)
+        {
+            print(number);
+        }
+        
+        void print(integer_type in_number)
+        {
+            char * buffer_ptr = buffer;
+            buffer_ptr = detail::print_sign(in_number, buffer_ptr);
+            auto stop = buffer_ptr;
+            size_t digits_used = 0;
+            {
+                auto digits_counter = in_number;
+                do
+                {
+                    digits_counter /= 10;
+                    digits_used++;
+                } while(digits_counter != 0);
+            }
+            digits_used = (separator_spacing > 0) ? (digits_used + (digits_used - 1) / separator_spacing) : 0;
+            buffer_ptr += digits_used;
+            *buffer_ptr = 0;
+            size_t comma_counter = separator_spacing;
+            do
+            {
+                buffer_ptr--;
+                if(separator_spacing > 0)
+                {
+                    if(comma_counter == 0)
+                    {
+                        comma_counter = separator_spacing;
+                        *buffer_ptr = separator_character;
+                        continue;
+                    }
+                    comma_counter--;
+                }
+                const static char digit_table[] = { '9', '8', '7', '6', '5', '4', '3', '2', '1', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+                *buffer_ptr = digit_table[(in_number % 10) + 9];
+                in_number /= 10;
+            } while(buffer_ptr != stop);
+        }
+    };
+    
+    template <char separator_character, size_t separator_spacing>
+    struct print_integer_with_separator
+    {
+        template <typename integer_type>
+        printed_integer<integer_type, separator_spacing, separator_character> operator()(integer_type number) { return printed_integer<integer_type, separator_spacing, separator_character>(number); }
+    };
+    
+    template <typename integer_type>
+    printed_integer<integer_type, 0, ','> print_integer(integer_type number) { return printed_integer<integer_type, 0, ','>(number); }
     
     inline std::string get_directory(const std::string & string)
     {
