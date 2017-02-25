@@ -141,7 +141,7 @@ namespace atl
                     digits_used++;
                 } while(digits_counter != 0);
             }
-            digits_used = (separator_spacing > 0) ? (digits_used + (digits_used - 1) / separator_spacing) : 0;
+            digits_used = (separator_spacing > 0) ? (digits_used + (digits_used - 1) / separator_spacing) : digits_used;
             buffer_ptr += digits_used;
             *buffer_ptr = 0;
             size_t comma_counter = separator_spacing;
