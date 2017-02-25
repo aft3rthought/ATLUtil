@@ -53,6 +53,9 @@ namespace atl
         float g;
         float b;
         float a;
+
+        color()
+        {}
         
         color(float in_r, float in_g, float in_b) :
         r(in_r),
