@@ -3,7 +3,6 @@
 #pragma once
 
 #include "file.h"
-#include "serialize.h"
 #include "map_util.h"
 #include "numeric_casts.h"
 #include "string_util.h"
