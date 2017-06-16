@@ -115,7 +115,7 @@ namespace atl
         }
     }
     
-#warning TODO: support size_t digits before zero, a decimal character, and a flag for always show below zero/only show if non-zero
+#pragma message("TODO: support size_t digits before zero, a decimal character, and a flag for always show below zero/only show if non-zero")
     template <typename integer_type, size_t separator_spacing, char separator_character>
     struct printed_integer
     {

@@ -4,11 +4,11 @@
 #include <stdexcept>
 
 #ifndef atl_log_impl
-#define atl_log_impl(Parameters...) { printf(Parameters); }
+#define atl_log_impl printf
 #endif
 
 #ifndef atl_fatal_impl
-#define atl_fatal_impl(File, IntegerLine, Message) { atl_log_impl("%s, line %d: %s\n", File, IntegerLine, Message); throw std::logic_error(Message); }
+#define atl_fatal_impl(File, IntegerLine, Message) { atl_log_impl("%s, line %d: %s\n", File, IntegerLine, Message); exit(0); }
 #endif
 
 #endif

@@ -19,7 +19,7 @@ namespace atl
     template <typename integer_type>
     size_t bits_required_for_integer_value(integer_type input_value)
     {
-#warning TODO: size-neutral binary search
+#pragma message("TODO: size-neutral binary search")
         typename std::make_unsigned<integer_type>::type value = input_value;
         size_t bits_required = 0;
         while(value > 0)
@@ -110,7 +110,7 @@ namespace atl
 
     static inline bool bit_string_read_bits(input_bit_string_type & bit_string_state, unsigned char * output_buffer, size_t num_bits_to_read)
     {
-#warning TODO: Investigate working in a memset
+#pragma message("TODO: Investigate working in a memset")
         auto max_bits_remaining = bit_string_state.bytes_remaining() * 8 + bit_string_state.bit_offset;
         if(num_bits_to_read > max_bits_remaining) return false;
         
@@ -234,7 +234,7 @@ namespace atl
     template <typename state_generator_callable_type>
     bool bit_string_write_bits(state_generator_callable_type state_generator, const bit_string_byte_type * buffer, size_t num_bits)
     {
-#warning TODO: Investigate working in a memset
+#pragma message("TODO: Investigate working in a memset")
         output_bit_string_type & bit_string_state = state_generator(num_bits);
         auto bits_written = (size_t)0;
         while(bits_written < num_bits)
