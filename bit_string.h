@@ -232,9 +232,10 @@ namespace atl
      */
     
     template <typename state_generator_callable_type>
-    bool bit_string_write_bits(state_generator_callable_type state_generator, const bit_string_byte_type * buffer, size_t num_bits)
+    bool bit_string_write_bits(state_generator_callable_type & state_generator, const bit_string_byte_type * buffer, size_t num_bits)
     {
 #pragma message("TODO: Investigate working in a memset")
+#pragma message("TODO: Bits set in the incoming value outside of the range (IE writing 2 bits of 0xFF) will end up leaking into the whole range. Intended?")
         output_bit_string_type & bit_string_state = state_generator(num_bits);
         auto bits_written = (size_t)0;
         while(bits_written < num_bits)
@@ -263,45 +264,45 @@ namespace atl
     }
     
     template <typename state_generator_callable_type>
-    bool bit_string_write_bytes(state_generator_callable_type state_generator, const bit_string_byte_type * buffer, uint32_t buffer_size_in_bytes)
+    bool bit_string_write_bytes(state_generator_callable_type & state_generator, const bit_string_byte_type * buffer, uint32_t buffer_size_in_bytes)
     {
         return bit_string_write_bits(state_generator, buffer, buffer_size_in_bytes * 8);
     }
     
     template <typename value_type, typename state_generator_callable_type>
-    bool bit_string_write_value(state_generator_callable_type state_generator, const value_type & value)
+    bool bit_string_write_value(state_generator_callable_type & state_generator, const value_type & value)
     {
         return bit_string_write_bytes(state_generator, (const bit_string_byte_type *)&value, sizeof(value_type));
     }
     
     template <typename value_type = bool, typename state_generator_callable_type>
-    bool bit_string_write_value(state_generator_callable_type state_generator, const bool & value)
+    bool bit_string_write_value(state_generator_callable_type & state_generator, const bool & value)
     {
-        unsigned char value_to_write = value ? 0xFF : 0x00;
+        auto value_to_write = value ? (unsigned char)0b1 : (unsigned char)0b0;
         return bit_string_write_bits(state_generator, &value_to_write, 1);
     }
     
     template <typename value_type, typename state_generator_callable_type>
-    bool bit_string_write_values(state_generator_callable_type state_generator, const value_type & value)
+    bool bit_string_write_values(state_generator_callable_type & state_generator, const value_type & value)
     {
         return bit_string_write_value(state_generator, value);
     }
     
     template <typename value_type, typename state_generator_callable_type, typename ... arg_pack_type>
-    bool bit_string_write_values(state_generator_callable_type state_generator, const value_type & value, arg_pack_type&&... arg_pack)
+    bool bit_string_write_values(state_generator_callable_type & state_generator, const value_type & value, arg_pack_type&&... arg_pack)
     {
         if(bit_string_write_value(state_generator, value)) return bit_string_write_values(state_generator, arg_pack...);
         return false;
     }
     
     template <typename array_type, size_t array_size, typename state_generator_callable_type>
-    bool bit_string_write_c_array(state_generator_callable_type state_generator, const array_type (&in_array)[array_size])
+    bool bit_string_write_c_array(state_generator_callable_type & state_generator, const array_type (&in_array)[array_size])
     {
         return bit_string_write_bytes(state_generator, (const bit_string_byte_type *)in_array, array_size * sizeof(array_type));
     }
     
     template <typename integer_type, typename state_generator_callable_type>
-    bool bit_string_write_ranged_integer(state_generator_callable_type state_generator, integer_type value, integer_type min, integer_type max)
+    bool bit_string_write_ranged_integer(state_generator_callable_type & state_generator, integer_type value, integer_type min, integer_type max)
     {
         if(max == min)
         {
@@ -317,7 +318,7 @@ namespace atl
     }
     
     template <typename integer_type, typename state_generator_callable_type>
-    bool bit_string_write_chunked_integer(state_generator_callable_type state_generator, integer_type value, size_t chunk_size)
+    bool bit_string_write_chunked_integer(state_generator_callable_type & state_generator, integer_type value, size_t chunk_size)
     {
         using local_integer_type = typename std::make_unsigned<integer_type>::type;
         local_integer_type current_value = std::is_signed<integer_type>::value ? ((value << 1) ^ (value >> 31)) : value;
