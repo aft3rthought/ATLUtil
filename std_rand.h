@@ -57,6 +57,12 @@ namespace atl
             return *(list.begin() + rand_size_t(0, list.size() - 1));
         }
         
+        template <typename Itr>
+        Itr rand_select(Itr begin, Itr end)
+        {
+            return begin + rand_size_t(0, end - begin);
+        }
+        
         std::random_device device;
         std::mt19937 generator;
     };
@@ -113,6 +119,12 @@ namespace atl
         const T & rand_select(std::initializer_list<T> list)
         {
             return *(list.begin() + rand_size_t(0, list.size() - 1));
+        }
+        
+        template <typename Itr>
+        Itr rand_select(Itr begin, Itr end)
+        {
+            return begin + rand_size_t(0, end - begin);
         }
         
         std::mt19937 generator;
