@@ -154,7 +154,7 @@ namespace atl
 
         float x, y;
         
-        point2f(float in_x, float in_y) : x(in_x), y(in_y) {};
+        constexpr point2f(float in_x, float in_y) : x(in_x), y(in_y) {};
         point2f() {};
         
         point2f & set(float in_x, float in_y) {
