@@ -202,6 +202,10 @@ namespace atl
             return dot(*this);
         }
         
+        float manhattan_distance(const point2f & in_otherPoint) const {
+            return std::abs(x - in_otherPoint.x) + std::abs(y - in_otherPoint.y);
+        }
+        
         point2f & operator += (const point2f & in_otherPoint) {
             x += in_otherPoint.x;
             y += in_otherPoint.y;
