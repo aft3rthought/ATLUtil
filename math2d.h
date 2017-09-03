@@ -154,7 +154,7 @@ namespace atl
 
         float x, y;
         
-        constexpr point2f(float in_x, float in_y) : x(in_x), y(in_y) {};
+        constexpr point2f(float in_x, float in_y) noexcept : x(in_x), y(in_y) {};
         point2f() {};
         
         point2f & set(float in_x, float in_y) {
@@ -279,12 +279,12 @@ namespace atl
             radius = (l_width + l_height) * 0.5f;
         }
         
-        circlef(float in_centerX, float in_centerY, float in_radius) :
+        constexpr circlef(float in_centerX, float in_centerY, float in_radius) noexcept :
         center(in_centerX, in_centerY),
         radius(in_radius)
         {}
         
-        circlef(const point2f & in_center, float in_radius) :
+        constexpr circlef(const point2f & in_center, float in_radius) noexcept :
         center(in_center),
         radius(in_radius)
         {}
@@ -312,7 +312,7 @@ namespace atl
     public:
         float min, max;
         
-        rangef(float in_min, float in_max) :
+        constexpr rangef(float in_min, float in_max) noexcept :
         min(in_min),
         max(in_max)
         {}
@@ -438,19 +438,19 @@ namespace atl
             };
         };
         
-        box2f(const rangef & in_x, const rangef & in_y) :
+        constexpr box2f(const rangef & in_x, const rangef & in_y) noexcept :
         x(in_x),
         y(in_y)
         {}
         
-        box2f(float in_t, float in_r, float in_b, float in_l) :
+        constexpr box2f(float in_t, float in_r, float in_b, float in_l) noexcept :
         t(in_t),
         r(in_r),
         b(in_b),
         l(in_l)
         {}
 
-        box2f(const atl::point2f & in_pt) :
+        constexpr box2f(const atl::point2f & in_pt) noexcept :
         t(in_pt.y),
         r(in_pt.x),
         b(in_pt.y),
