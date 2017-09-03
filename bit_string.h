@@ -222,7 +222,8 @@ namespace atl
             current_bit += chunk_size;
             if(!bit_string_read_value(bit_string_state, chunk_flag)) return false;
         }
-        value = std::is_signed<integer_type>::value ? ((result << 1) ^ (result >> 31)) : result;
+        using definitely_unsigned_integer_type = typename std::make_unsigned<integer_type>::type;
+        value = std::is_signed<integer_type>::value ? ((integer_type)((definitely_unsigned_integer_type)result >> 1) ^ -(result & 0b1)) : result;
         return true;
     }
     
@@ -269,17 +270,20 @@ namespace atl
         return bit_string_write_bits(state_generator, buffer, buffer_size_in_bytes * 8);
     }
     
+    
+    
     template <typename value_type, typename state_generator_callable_type>
     bool bit_string_write_value(state_generator_callable_type & state_generator, const value_type & value)
     {
-        return bit_string_write_bytes(state_generator, (const bit_string_byte_type *)&value, sizeof(value_type));
-    }
-    
-    template <typename value_type = bool, typename state_generator_callable_type>
-    bool bit_string_write_value(state_generator_callable_type & state_generator, const bool & value)
-    {
-        auto value_to_write = value ? (unsigned char)0b1 : (unsigned char)0b0;
-        return bit_string_write_bits(state_generator, &value_to_write, 1);
+        if(std::is_same<value_type, bool>::value) {
+#warning TODO: This causes code generation of weird stuff
+            auto value_to_write = (bool)value ? (unsigned char)0b1 : (unsigned char)0b0;
+            return bit_string_write_bits(state_generator, &value_to_write, 1);
+        }
+        else
+        {
+            return bit_string_write_bytes(state_generator, (const bit_string_byte_type *)&value, sizeof(value_type));
+        }
     }
     
     template <typename value_type, typename state_generator_callable_type>
@@ -312,7 +316,7 @@ namespace atl
         {
             auto range = max - min;
             value -= min;
-            return bit_string_write_bits(state_generator, value, bits_required_for_non_negative_integer_value(range));
+            return bit_string_write_bits(state_generator, (const bit_string_byte_type *)&value, bits_required_for_integer_value(range));
         }
         return false;
     }
@@ -321,8 +325,9 @@ namespace atl
     bool bit_string_write_chunked_integer(state_generator_callable_type & state_generator, integer_type value, size_t chunk_size)
     {
         using local_integer_type = typename std::make_unsigned<integer_type>::type;
-        local_integer_type current_value = std::is_signed<integer_type>::value ? ((value << 1) ^ (value >> 31)) : value;
-        local_integer_type mask = std::numeric_limits<local_integer_type>::max() >> (sizeof(local_integer_type) * 8 - chunk_size);
+        constexpr local_integer_type local_integer_size_bits = sizeof(local_integer_type) * 8;
+        local_integer_type current_value = std::is_signed<integer_type>::value ? ((value << 1) ^ (value >> (local_integer_size_bits - 1))) : value;
+        local_integer_type mask = std::numeric_limits<local_integer_type>::max() >> (local_integer_size_bits - chunk_size);
         while(current_value > 0)
         {
             local_integer_type write_val = current_value & mask;
