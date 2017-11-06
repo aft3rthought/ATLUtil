@@ -157,28 +157,28 @@ namespace atl
         constexpr point2f(float in_x, float in_y) noexcept : x(in_x), y(in_y) {};
         point2f() {};
         
-        point2f & set(float in_x, float in_y) {
+		constexpr point2f & set(float in_x, float in_y) {
             x = in_x;
             y = in_y;
             return *this;
         }
         
-        bool operator == (const point2f & in_otherPoint) const {
+		constexpr  bool operator == (const point2f & in_otherPoint) const {
             return x == in_otherPoint.x && y == in_otherPoint.y;
         }
         
-        bool operator != (const point2f & in_otherPoint) const {
+		constexpr bool operator != (const point2f & in_otherPoint) const {
             return x != in_otherPoint.x || y != in_otherPoint.y;
         }
         
-        point2f & interpolate(const point2f & in_to, float in_val)
+		constexpr point2f & interpolate(const point2f & in_to, float in_val)
         {
             x = interpf(x, in_to.x, in_val);
             y = interpf(y, in_to.y, in_val);
             return *this;
         }
 
-        point2f operator - () const {
+        constexpr point2f operator - () const {
             return point2f(-x, -y);
         }
         
@@ -206,41 +206,41 @@ namespace atl
             return std::abs(x - in_otherPoint.x) + std::abs(y - in_otherPoint.y);
         }
         
-        point2f & operator += (const point2f & in_otherPoint) {
+		constexpr point2f & operator += (const point2f & in_otherPoint) {
             x += in_otherPoint.x;
             y += in_otherPoint.y;
             return *this;
         }
         
-        point2f & operator -= (const point2f & in_otherPoint) {
+		constexpr point2f & operator -= (const point2f & in_otherPoint) {
             x -= in_otherPoint.x;
             y -= in_otherPoint.y;
             return *this;
         }
         
-        point2f & operator *= (float in_scalar) {
+		constexpr point2f & operator *= (float in_scalar) {
             x *= in_scalar;
             y *= in_scalar;
             return *this;
         }
         
-        point2f & operator /= (float in_scalar) {
+		constexpr point2f & operator /= (float in_scalar) {
             return *this *= (1.f / in_scalar);
         }
         
-        point2f operator + (const point2f & in_otherPt) const {
+		constexpr point2f operator + (const point2f & in_otherPt) const {
             return point2f(*this) += in_otherPt;
         }
         
-        point2f operator - (const point2f & in_otherPt) const {
+		constexpr point2f operator - (const point2f & in_otherPt) const {
             return point2f(*this) -= in_otherPt;
         }
         
-        point2f operator * (float in_scalar) const {
+		constexpr point2f operator * (float in_scalar) const {
             return point2f(*this) *= in_scalar;
         }
         
-        point2f operator / (float in_scalar) const {
+		constexpr point2f operator / (float in_scalar) const {
             return point2f(*this) /= in_scalar;
         }
         
@@ -486,6 +486,10 @@ namespace atl
         
         box2f(const point2f & in_corner, const size2f & in_size, anchoring in_anchoring)
         {
+			l = in_corner.x;
+			r = in_corner.x;
+			b = in_corner.y;
+			t = in_corner.y;
             // X coordinate:
             switch(in_anchoring)
             {
@@ -493,18 +497,18 @@ namespace atl
                 case anchoring::center_left:
                 case anchoring::bottom_left:
                 {
-                    l = in_corner.x;
-                    r = in_corner.x + in_size.w;
+                    r += in_size.w;
                     break;
                 }
-                    
+                
+				default:
                 case anchoring::top_center:
                 case anchoring::centered:
                 case anchoring::bottom_center:
                 {
                     float l_halfWidth = in_size.w / 2.f;
-                    l = in_corner.x - l_halfWidth;
-                    r = in_corner.x + l_halfWidth;
+                    l -= l_halfWidth;
+                    r += l_halfWidth;
                     break;
                 }
                     
@@ -512,8 +516,7 @@ namespace atl
                 case anchoring::center_right:
                 case anchoring::bottom_right:
                 {
-                    l = in_corner.x - in_size.w;
-                    r = in_corner.x;
+                    l -= in_size.w;
                     break;
                 }
             }
@@ -525,18 +528,18 @@ namespace atl
                 case anchoring::top_center:
                 case anchoring::top_right:
                 {
-                    b = in_corner.y - in_size.h;
-                    t = in_corner.y;
+                    b -= in_size.h;
                     break;
                 }
                     
+				default:
                 case anchoring::center_left:
                 case anchoring::centered:
                 case anchoring::center_right:
                 {
                     float l_halfHeight = in_size.h / 2.f;
-                    b = in_corner.y - l_halfHeight;
-                    t = in_corner.y + l_halfHeight;
+                    b -= l_halfHeight;
+                    t += l_halfHeight;
                     break;
                 }
                     
@@ -544,14 +547,13 @@ namespace atl
                 case anchoring::bottom_center:
                 case anchoring::bottom_right:
                 {
-                    b = in_corner.y;
-                    t = in_corner.y + in_size.h;
+                    t += in_size.h;
                     break;
                 }
             }
         }
         
-        box2f(circlef in_circle) :
+        constexpr box2f(circlef in_circle) :
         t(in_circle.center.y + in_circle.radius),
         r(in_circle.center.x + in_circle.radius),
         b(in_circle.center.y - in_circle.radius),

@@ -223,7 +223,15 @@ namespace atl
             if(!bit_string_read_value(bit_string_state, chunk_flag)) return false;
         }
         using definitely_unsigned_integer_type = typename std::make_unsigned<integer_type>::type;
-        value = std::is_signed<integer_type>::value ? ((integer_type)((definitely_unsigned_integer_type)result >> 1) ^ -(result & 0b1)) : result;
+		using definitely_signed_integer_type = typename std::make_signed<integer_type>::type;
+		if(std::is_signed<integer_type>::value)
+		{
+			value = ((definitely_signed_integer_type)((definitely_unsigned_integer_type)result >> 1) ^ -((definitely_signed_integer_type)result & 0b1));
+		}
+		else
+		{
+			value = result;
+		}
         return true;
     }
     
@@ -276,7 +284,7 @@ namespace atl
     bool bit_string_write_value(state_generator_callable_type & state_generator, const value_type & value)
     {
         if(std::is_same<value_type, bool>::value) {
-#warning TODO: This causes code generation of weird stuff
+#pragma message("TODO: This causes code generation of weird stuff")
             auto value_to_write = (bool)value ? (unsigned char)0b1 : (unsigned char)0b0;
             return bit_string_write_bits(state_generator, &value_to_write, 1);
         }
