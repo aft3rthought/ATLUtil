@@ -4,6 +4,16 @@
 
 namespace atl
 {
+	/*
+	 integer_divide_rounding_up
+	 Divide value by divisor, rounding up
+	*/
+	template <class T>
+	constexpr T integer_divide_rounding_up(T value, T divisor)
+	{
+		return (value + divisor - 1) / divisor;
+	}
+
     /*
      clamp
      Clamp value to the range [targetMin, targetMax]
