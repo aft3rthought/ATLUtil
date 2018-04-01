@@ -39,7 +39,11 @@ namespace atl
 
     struct input_bit_string_type
     {
-        input_bit_string_type() {};
+        input_bit_string_type()
+		{
+			ptr = begin = end = nullptr;
+			bit_offset = 0;
+		}
         
         input_bit_string_type(const bit_string_byte_type * attach_begin, const bit_string_byte_type * attach_end)
         {
@@ -59,7 +63,11 @@ namespace atl
     
     struct output_bit_string_type
     {
-        output_bit_string_type() {};
+        output_bit_string_type()
+		{
+			ptr = begin = end = nullptr;
+			bit_offset = 0;
+		}
         
         output_bit_string_type(bit_string_byte_type * attach_begin, bit_string_byte_type * attach_end)
         {
