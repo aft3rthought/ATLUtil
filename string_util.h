@@ -12,7 +12,7 @@ namespace atl
         std::vector<std::string> result;
         
         auto chunkBeginItr = in_string.begin();
-        auto chunkEndItr = in_string.begin();
+		auto chunkEndItr = chunkBeginItr;
         auto sepItr = in_separator.begin();
         auto sepEnd = in_separator.end();
         bool matchingSeparator = false;
@@ -69,7 +69,7 @@ namespace atl
     inline std::string trim_whitespace(const std::string & in_string)
     {
         auto chunkBeginItr = in_string.end();
-        auto chunkEndItr = in_string.end();
+		auto chunkEndItr = chunkBeginItr;
         for(auto stringItr = in_string.begin(); stringItr != in_string.end(); stringItr++)
         {
             if(!is_whitespace(*stringItr))
@@ -117,19 +117,20 @@ namespace atl
     
 #pragma message("TODO: support size_t digits before zero, a decimal character, and a flag for always show below zero/only show if non-zero")
     template <typename integer_type, size_t separator_spacing, char separator_character>
-    struct printed_integer
+    struct printed_integer_with_separator
     {
         static constexpr size_t digits_for_type_alone() { return max_digits_for_printing_integer_type<integer_type>(); }
-        char buffer[digits_for_type_alone() + ((separator_spacing > 0) ? (digits_for_type_alone() / separator_spacing) : 0) + 1];
+        char buffer[1 + digits_for_type_alone() + ((separator_spacing > 0) ? (digits_for_type_alone() / separator_spacing) : 0)];
         
-        printed_integer(integer_type number)
+		printed_integer_with_separator(integer_type number)
         {
             print(number);
         }
         
         void print(integer_type in_number)
         {
-            char * buffer_ptr = buffer;
+			static_assert(separator_spacing > 0, "separator_spacing must be greater than zero");
+			char * buffer_ptr = buffer;
             buffer_ptr = detail::print_sign(in_number, buffer_ptr);
             auto stop = buffer_ptr;
             size_t digits_used = 0;
@@ -141,7 +142,8 @@ namespace atl
                     digits_used++;
                 } while(digits_counter != 0);
             }
-            digits_used = (separator_spacing > 0) ? (digits_used + (digits_used - 1) / separator_spacing) : digits_used;
+			if(separator_spacing > 0)
+				digits_used = digits_used + (digits_used - 1) / separator_spacing;
             buffer_ptr += digits_used;
             *buffer_ptr = 0;
             size_t comma_counter = separator_spacing;
@@ -164,16 +166,53 @@ namespace atl
             } while(buffer_ptr != stop);
         }
     };
+
+	template <typename integer_type>
+	struct printed_integer
+	{
+		static constexpr size_t digits_for_type_alone() { return max_digits_for_printing_integer_type<integer_type>(); }
+		char buffer[1 + digits_for_type_alone()];
+
+		printed_integer(integer_type number)
+		{
+			print(number);
+		}
+
+		void print(integer_type in_number)
+		{
+			char * buffer_ptr = buffer;
+			buffer_ptr = detail::print_sign(in_number, buffer_ptr);
+			auto stop = buffer_ptr;
+			size_t digits_used = 0;
+			{
+				auto digits_counter = in_number;
+				do
+				{
+					digits_counter /= 10;
+					digits_used++;
+				} while(digits_counter != 0);
+			}
+			buffer_ptr += digits_used;
+			*buffer_ptr = 0;
+			do
+			{
+				buffer_ptr--;
+				const static char digit_table[] = {'9', '8', '7', '6', '5', '4', '3', '2', '1', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+				*buffer_ptr = digit_table[(in_number % 10) + 9];
+				in_number /= 10;
+			} while(buffer_ptr != stop);
+		}
+	};
     
     template <char separator_character, size_t separator_spacing>
     struct print_integer_with_separator
     {
         template <typename integer_type>
-        printed_integer<integer_type, separator_spacing, separator_character> operator()(integer_type number) { return printed_integer<integer_type, separator_spacing, separator_character>(number); }
+		printed_integer_with_separator<integer_type, separator_spacing, separator_character> operator()(integer_type number) { return printed_integer_with_separator<integer_type, separator_spacing, separator_character>(number); }
     };
     
     template <typename integer_type>
-    printed_integer<integer_type, 0, ','> print_integer(integer_type number) { return printed_integer<integer_type, 0, ','>(number); }
+    printed_integer<integer_type> print_integer(integer_type number) { return printed_integer<integer_type>(number); }
     
     inline std::string get_directory(const std::string & string)
     {
