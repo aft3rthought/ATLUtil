@@ -34,15 +34,6 @@ namespace atl
     }
     
     /*
-     c_array_last_const_ref: Returns a const reference to the last element of a C-style array
-     */
-    template <typename T, size_t N>
-    constexpr const T & c_array_last_by_const_ref(T(&in_array)[N])
-    {
-        return in_array[N-1];
-    }
-    
-    /*
      wrapIdx: Returns the (i % N)'th item in an array of length N.
      */
     template <typename T, size_t N>
