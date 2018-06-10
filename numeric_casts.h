@@ -4,13 +4,12 @@
 
 namespace atl
 {
-    constexpr uint32_t narrow_unsigned(uint64_t val) { return (uint32_t)val; }
-    constexpr int32_t narrow_signed(int64_t val) { return (int32_t)val; }
-    constexpr int32_t make_signed(uint32_t val) { return (int32_t)val; }
-    constexpr uint32_t make_unsigned(int32_t val) { return (uint32_t)val; }
-    constexpr int32_t narrow_size_t_to_int(size_t val) { return (int32_t)val; }
-	
 	// Default conversions
+	//
+	// These are placeholders. Currently they just static cast.
+	// What contract do these enforce?
+	//
+
 	template <typename naked_type>
 	constexpr float default_int_to_float(const naked_type & value)
 	{
@@ -66,6 +65,11 @@ namespace atl
 	}
 
 	// Safe comparators
+	//
+	// These sacrifice extra instructions in order to supply correctness.
+	// For instance, comparing a signed and unsigned integer is made safe by doing an extra check to see if the signed integer is negative.
+	//
+
 	template <typename wrapped_type>
 	struct safe_comparator_type
 	{
