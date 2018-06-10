@@ -13,7 +13,7 @@ namespace atl
 		region_value_type * end() const { return end_pointer; }
 		region_value_type * front() const { return begin_pointer; }
 		region_value_type * back() const { return end_pointer - 1; }
-		size_t size() const { return end_pointer - begin_pointer; }
+		int size() const { return int{end_pointer - begin_pointer}; }
 		bool empty() const { return end_pointer <= begin_pointer; }
 
 		operator region_type<const region_value_type> () const
