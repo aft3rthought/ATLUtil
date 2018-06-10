@@ -972,4 +972,10 @@ namespace atl
         }
         return l_result;
     }
+
+	inline void clamp_point_to_box(atl::point2f & point, const atl::box2f & box)
+	{
+		point.x = atl::clamp(point.x, box.l, box.r);
+		point.y = atl::clamp(point.y, box.b, box.t);
+	}
 }
