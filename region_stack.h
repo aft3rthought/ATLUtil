@@ -7,18 +7,18 @@ namespace atl
 	template <typename region_value_type>
 	struct region_stack_type
 	{
-		region<region_value_type> internal_storage;
+		region_type<region_value_type> internal_storage;
 		region_value_type * internal_stack_head;
 
 		region_stack_type() {}
 
-		region_stack_type(const region<region_value_type> & in_storage)
+		region_stack_type(const region_type<region_value_type> & in_storage)
 		:
 		internal_storage(in_storage),
 		internal_stack_head(in_storage.begin())
 		{}
 
-		region_stack_type(const region<region_value_type> & in_storage, region_value_type * in_stack_head)
+		region_stack_type(const region_type<region_value_type> & in_storage, region_value_type * in_stack_head)
 		:
 		internal_storage(in_storage),
 		internal_stack_head(in_stack_head)
