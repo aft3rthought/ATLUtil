@@ -35,6 +35,38 @@ namespace atl
 	{
 		return output_range.map(input_range.unmap(value));
 	}
+
+	template <class number_type>
+	struct limited_math_operation_result_type
+	{
+		number_type value;
+		bool reached_limit;
+	};
+
+	template <class number_type>
+	limited_math_operation_result_type<number_type> limited_increment(number_type & value, number_type delta, number_type max)
+	{
+		value += delta;
+		if(value >= delta)
+		{
+			value = max;
+			return {value, true};
+		}
+		return {value, false};
+	}
+
+	template <class number_type>
+	limited_math_operation_result_type<number_type> limited_decrement(number_type & value, number_type delta, number_type min)
+	{
+		value -= delta;
+		if(value <= delta)
+		{
+			value = min;
+			return {value, true};
+		}
+		return {value, false};
+	}
+
     /*
      clamp
      Clamp value to the range [targetMin, targetMax]
