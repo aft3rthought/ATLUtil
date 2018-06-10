@@ -14,6 +14,27 @@ namespace atl
 		return (value + divisor - 1) / divisor;
 	}
 
+	template <class number_type>
+	struct numeric_range_type
+	{
+		const number_type v0, v1, span;
+
+		constexpr number_type unmap(number_type value) const { return (value - v0) / span; }
+		constexpr number_type map(number_type value) const { return v0 + value * span; }
+		constexpr number_type clamp(number_type value) const { return value < v0 ? v0 : (value > v1 ? v1 : value); }
+	};
+
+	template <class number_type>
+	constexpr numeric_range_type<number_type> numeric_range(number_type v0, number_type v1)
+	{
+		return numeric_range_type<number_type>{v0, v1, v1 - v0};
+	}
+
+	template <class number_type>
+	number_type remap(number_type value, const numeric_range_type<number_type> & input_range, const numeric_range_type<number_type> & output_range)
+	{
+		return output_range.map(input_range.unmap(value));
+	}
     /*
      clamp
      Clamp value to the range [targetMin, targetMax]
