@@ -23,7 +23,7 @@ namespace atl
     {
         return value < targetMin ? targetMin : (value > targetMax ? targetMax : value);
     }
-    
+
     /*
      mapf
      Generate an interpolation factor from [0, 1] using value, originMin, and originMax.
