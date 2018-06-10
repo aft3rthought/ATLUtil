@@ -15,6 +15,9 @@ namespace atl
 		region_value_type * back() const { return end_pointer - 1; }
 		int size() const { return int{end_pointer - begin_pointer}; }
 		bool empty() const { return end_pointer <= begin_pointer; }
+		
+		region_type<region_value_type> remove_tail(int amount) { return {begin_pointer, end_pointer - amount}; }
+		region_type<region_value_type> remove_head(int amount) { return {begin_pointer + amount, end_pointer}; }
 
 		operator region_type<const region_value_type> () const
 		{
