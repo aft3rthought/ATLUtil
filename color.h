@@ -11,7 +11,7 @@ namespace atl
     public:
         float alpha;
         
-        color_alpha(float in_alpha) :
+		constexpr color_alpha(float in_alpha) :
         alpha(in_alpha)
         {}
     };
@@ -26,17 +26,17 @@ namespace atl
         float value;
         float alpha;
         
-        color_gray(float in_value) :
+		constexpr color_gray(float in_value) :
         value(in_value),
         alpha(1.f)
         {}
         
-        color_gray(float in_value, float in_alpha) :
+		constexpr color_gray(float in_value, float in_alpha) :
         value(in_value),
         alpha(in_alpha)
         {}
         
-        color_gray(unsigned char in_value, unsigned char in_alpha) :
+		constexpr color_gray(unsigned char in_value, unsigned char in_alpha) :
         value((float)in_value * (1.f / 255.f)),
         alpha((float)in_alpha * (1.f / 255.f))
         {}
@@ -57,42 +57,42 @@ namespace atl
         color()
         {}
         
-        color(float in_r, float in_g, float in_b) :
+		constexpr color(float in_r, float in_g, float in_b) :
         r(in_r),
         g(in_g),
         b(in_b),
         a(1.f)
         {}
         
-        color(float in_r, float in_g, float in_b, float in_a) :
+		constexpr color(float in_r, float in_g, float in_b, float in_a) :
         r(in_r),
         g(in_g),
         b(in_b),
         a(in_a)
         {}
         
-        color(const color_gray & in_color) :
+		constexpr color(const color_gray & in_color) :
         r(in_color.value),
         g(in_color.value),
         b(in_color.value),
         a(in_color.alpha)
         {}
         
-        color(const color_alpha & in_color) :
+		constexpr color(const color_alpha & in_color) :
         r(1.f),
         g(1.f),
         b(1.f),
         a(in_color.alpha)
         {}
         
-        color(unsigned char in_r, unsigned char in_g, unsigned char in_b) :
+		constexpr color(unsigned char in_r, unsigned char in_g, unsigned char in_b) :
         r(float(in_r) * (1.f / 255.f)),
         g(float(in_g) * (1.f / 255.f)),
         b(float(in_b) * (1.f / 255.f)),
         a(1.f)
         {}
         
-        color(unsigned char in_r, unsigned char in_g, unsigned char in_b, unsigned char in_a) :
+		constexpr color(unsigned char in_r, unsigned char in_g, unsigned char in_b, unsigned char in_a) :
         r(float(in_r) * (1.f / 255.f)),
         g(float(in_g) * (1.f / 255.f)),
         b(float(in_b) * (1.f / 255.f)),
@@ -135,18 +135,26 @@ namespace atl
         }
     };
     
-    inline color operator * (const color & lhs, const color & rhs) {
+	constexpr inline color operator * (const color & lhs, const color & rhs) {
         return color(lhs.r * rhs.r, lhs.g * rhs.g, lhs.b * rhs.b, lhs.a * rhs.a);
     }
-    
-    inline color operator + (const color & lhs, const color & rhs) {
+
+	constexpr inline color operator * (const color & lhs, const float & rhs) {
+		return color(lhs.r * rhs, lhs.g * rhs, lhs.b * rhs, lhs.a * rhs);
+	}
+
+	constexpr inline color operator * (const float & lhs, const color & rhs) {
+		return color(lhs * rhs.r, lhs * rhs.g, lhs * rhs.b, lhs * rhs.a);
+	}
+
+	constexpr inline color operator + (const color & lhs, const color & rhs) {
         return color(lhs.r + rhs.r, lhs.g + rhs.g, lhs.b + rhs.b, lhs.a + rhs.a);
     }
-    
-    inline color operator * (const color & lhs, const float & rhs) {
-        return color(lhs.r * rhs, lhs.g * rhs, lhs.b * rhs, lhs.a * rhs);
-    }
-    
+
+	constexpr inline color operator - (const color & lhs, const color & rhs) {
+		return color(lhs.r - rhs.r, lhs.g - rhs.g, lhs.b - rhs.b, lhs.a - rhs.a);
+	}
+
     class color_premul
     {
     public:
