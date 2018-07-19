@@ -24,10 +24,42 @@ namespace atl
 		constexpr number_type clamp(number_type value) const { return value < v0 ? v0 : (value > v1 ? v1 : value); }
 	};
 
+	template <class scalar_type, class output_type>
+	struct extrapolation_type
+	{
+		const output_type v0, span;
+
+		constexpr output_type map(scalar_type value) const { return v0 + value * span; }
+	};
+
+	template <bool clamp_input, class input_type, class output_type>
+	struct linear_transformation_type
+	{
+		const numeric_range_type<input_type> in;
+		const extrapolation_type<input_type, output_type> out;
+
+		constexpr output_type operator()(input_type value) const
+		{
+			return out.map(in.unmap(clamp_input ? in.clamp(value) : value));
+		}
+	};
+
 	template <class number_type>
 	constexpr numeric_range_type<number_type> numeric_range(number_type v0, number_type v1)
 	{
 		return numeric_range_type<number_type>{v0, v1, v1 - v0};
+	}
+
+	template <class scalar_type, class output_type>
+	constexpr extrapolation_type<scalar_type, output_type> extrapolation(output_type v0, output_type v1)
+	{
+		return extrapolation_type<scalar_type, output_type>{v0, v1 - v0};
+	}
+
+	template <bool clamp_input, class input_type, class output_type>
+	constexpr linear_transformation_type<clamp_input, input_type, output_type> linear_transformation(input_type i0, input_type i1, output_type o0, output_type o1)
+	{
+		return linear_transformation_type<clamp_input, input_type, output_type>{ numeric_range(i0, i1),extrapolation<input_type>(o0, o1) };
 	}
 
 	template <class number_type>
@@ -47,7 +79,7 @@ namespace atl
 	limited_math_operation_result_type<number_type> limited_increment(number_type & value, number_type delta, number_type max)
 	{
 		value += delta;
-		if(value >= delta)
+		if(value >= max)
 		{
 			value = max;
 			return {value, true};
@@ -59,12 +91,22 @@ namespace atl
 	limited_math_operation_result_type<number_type> limited_decrement(number_type & value, number_type delta, number_type min)
 	{
 		value -= delta;
-		if(value <= delta)
+		if(value <= min)
 		{
 			value = min;
 			return {value, true};
 		}
 		return {value, false};
+	}
+
+	template <class number_type>
+	limited_math_operation_result_type<number_type> move_to_limit(number_type & value, number_type delta, number_type limit)
+	{
+		if(value > limit)
+			return limited_decrement(value, delta, limit);
+		if(value < limit)
+			return limited_increment(value, delta, limit);
+		return {value, true};
 	}
 
     /*
