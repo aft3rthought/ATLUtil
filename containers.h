@@ -1,4 +1,4 @@
-//  Copyright © 2017 Maxwell Robinson. All rights reserved.
+//  Copyright © 2019 Maxwell Robinson. All rights reserved.
 
 #pragma once
 

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 namespace atl
 {
     /* 
@@ -9,26 +11,74 @@ namespace atl
      * utility functions for determining the number of bits required to represent an integral type
      */
 
-    template <typename integer_type>
-    constexpr integer_type compile_time_bits_required_for_integer_value(integer_type input_value)
-    {
-        typename std::make_unsigned<integer_type>::type value = input_value;
-        return 1 + (value == 0 || value == 1 ? 0 : compile_time_bits_required_for_integer_value(value >> 1));
-    }
-    
-    template <typename integer_type>
-    size_t bits_required_for_integer_value(integer_type input_value)
-    {
-#pragma message("TODO: size-neutral binary search")
-        typename std::make_unsigned<integer_type>::type value = input_value;
-        size_t bits_required = 0;
-        while(value > 0)
-        {
-            value = value >> 1;
-            bits_required++;
-        }
-        return bits_required;
-    }
+	template <typename integer_type>
+	constexpr integer_type compile_time_log2(integer_type x)
+	{
+		return x == 1 ? 0 : (1 + compile_time_log2(x >> 1));
+	}
+
+	static_assert(compile_time_log2<unsigned>(8) == 3, "compile_time_log2: 8 should be 3");
+	static_assert(compile_time_log2<unsigned>(32) == 5, "compile_time_log2: 32 should be 5");
+	static_assert(compile_time_log2<unsigned>(64) == 6, "compile_time_log2: 64 should be 6");
+	static_assert(compile_time_log2<unsigned>(std::numeric_limits<unsigned>::max()) == (sizeof(unsigned) * 8 - 1), "compile_time_log2: unsigned max");
+
+	template <typename integer_type>
+	constexpr bool fits_in_n_bits(integer_type input_value, typename std::make_unsigned<integer_type>::type shift)
+	{
+		typename std::make_unsigned<integer_type>::type value = input_value;
+		return (input_value >> shift) == 0;
+	}
+
+	static_assert(fits_in_n_bits<unsigned>(0, 0), "fits_in_n_bits: assert 0 fits in 0");
+	static_assert(!fits_in_n_bits<unsigned>(1, 0), "fits_in_n_bits: assert 1 does not fit in 0");
+	static_assert(fits_in_n_bits<unsigned>(1, 1), "fits_in_n_bits: assert 1 fits in 1");
+	static_assert(!fits_in_n_bits<unsigned>(2, 1), "fits_in_n_bits: assert 2 does not fit in 1");
+	static_assert(fits_in_n_bits<unsigned>(2, 2), "fits_in_n_bits: assert 2 fits in 2");
+	static_assert(!fits_in_n_bits<unsigned>(15, 3), "fits_in_n_bits: assert 15 does not fit in 3");
+	static_assert(fits_in_n_bits<unsigned>(15, 4), "fits_in_n_bits: assert 15 fits in 4");
+	static_assert(!fits_in_n_bits<unsigned>(16, 4), "fits_in_n_bits: assert 16 does not fit in 4");
+	static_assert(fits_in_n_bits<unsigned>(16, 5), "fits_in_n_bits: assert 16 fits in 5");
+	static_assert(fits_in_n_bits<unsigned>(32767, 31), "fits_in_n_bits: assert 32767 fits in 31");
+	static_assert(fits_in_n_bits<unsigned>(std::numeric_limits<unsigned>::max(), sizeof(unsigned) * 8), "fits_in_n_bits: unsigned max");
+
+	template <typename integer_type>
+	constexpr integer_type integer_midpoint(integer_type lower, integer_type upper)
+	{
+		return integer_type{(lower + upper) / 2};
+	}
+
+	template <typename integer_type>
+	constexpr integer_type binary_search_step(std::integral_constant<std::size_t, 0>, integer_type lower, integer_type upper, integer_type value) {
+		return fits_in_n_bits(value, lower) ? lower : upper;
+	}
+
+	static_assert(binary_search_step<unsigned>(std::integral_constant<std::size_t, 0>(), 3, 4, 4) == 3, "binary_search_step, final step: 3,4,4 should return 3");
+	static_assert(binary_search_step<unsigned>(std::integral_constant<std::size_t, 0>(), 3, 4, 8) == 4, "binary_search_step, final step: 3,4,8 should return 4");
+	static_assert(binary_search_step<unsigned>(std::integral_constant<std::size_t, 0>(), 4, 5, 16) == 5, "binary_search_step, final step: 4,5,16 should return 5");
+
+	template <typename integer_type, std::size_t step_count>
+	constexpr integer_type binary_search_step(std::integral_constant<size_t, step_count>, integer_type lower, integer_type upper, integer_type value) {
+		return
+			fits_in_n_bits(value, integer_midpoint(lower, upper)) ?
+			 binary_search_step<integer_type>(std::integral_constant<size_t, step_count-1>(), lower, integer_midpoint(lower, upper), value) :
+			 binary_search_step<integer_type>(std::integral_constant<size_t, step_count-1>(), integer_midpoint(lower, upper), upper, value);
+	}
+
+	template <typename integer_type>
+	constexpr integer_type bits_required_for_integer(integer_type integer_value) {
+		using unsigned_type = std::make_unsigned<integer_type>::type;
+		constexpr unsigned_type unsigned_type_bits = sizeof(unsigned_type) * 8;
+		using step_count_type = std::integral_constant<size_t, compile_time_log2(unsigned_type_bits)>;
+		return static_cast<integer_type>(binary_search_step<unsigned_type>(step_count_type(), 0, unsigned_type_bits, integer_value));
+	}
+	
+	static_assert(bits_required_for_integer<unsigned>(0) == 0, "bits_required_for_integer: 0 should return 0");
+	static_assert(bits_required_for_integer<unsigned>(1) == 1, "bits_required_for_integer: 1 should return 1");
+	static_assert(bits_required_for_integer<unsigned>(2) == 2, "bits_required_for_integer: 2 should return 2");
+	static_assert(bits_required_for_integer<unsigned>(4) == 3, "bits_required_for_integer: 4 should return 3");
+	static_assert(bits_required_for_integer<unsigned>(8) == 4, "bits_required_for_integer: 8 should return 4");
+	static_assert(bits_required_for_integer<unsigned>(498734) == 19, "bits_required_for_integer: 498734 should return 19");
+	static_assert(bits_required_for_integer<unsigned>(std::numeric_limits<unsigned>::max()) == sizeof(unsigned) * 8, "bits_required_for_integer: unsigned max");
 
     /* 
      * atl
@@ -203,7 +253,7 @@ namespace atl
         }
         else if(max > min)
         {
-            auto bits_required = bits_required_for_integer_value(max - min);
+            auto bits_required = bits_required_for_integer(max - min);
             auto result = (integer_type)0;
             if(bit_string_read_bits(bit_string_state, (bit_string_byte_type *)&result, bits_required))
             {
@@ -332,7 +382,7 @@ namespace atl
         {
             auto range = max - min;
             value -= min;
-            return bit_string_write_bits(state_generator, (const bit_string_byte_type *)&value, bits_required_for_integer_value(range));
+            return bit_string_write_bits(state_generator, (const bit_string_byte_type *)&value, bits_required_for_integer(range));
         }
         return false;
     }

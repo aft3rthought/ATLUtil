@@ -401,7 +401,31 @@ namespace atl
             max = l_center + l_newHalfLength;
             return *this;
         }
-        
+
+		rangef & scale_about_midpoint(float in_scalar) {
+			float l_center = (max + min) * 0.5f;
+			float l_newHalfLength = (max - min) * in_scalar * 0.5f;
+			min = l_center - l_newHalfLength;
+			max = l_center + l_newHalfLength;
+			return *this;
+		}
+
+		rangef & scale_about_origin(float in_scalar) {
+			min *= in_scalar;
+			max *= in_scalar;
+			return *this;
+		}
+
+		rangef & scale_about_min(float in_scalar) {
+			max -= length() * in_scalar;
+			return *this;
+		}
+
+		rangef & scale_about_max(float in_scalar) {
+			min += length() * in_scalar;
+			return *this;
+		}
+
         rangef & flip() {
             std::swap(min, max);
             return *this;

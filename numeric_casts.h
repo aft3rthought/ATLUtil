@@ -1,6 +1,7 @@
 
-
 #pragma once
+
+#include <cstdint>
 
 namespace atl
 {
@@ -9,6 +10,7 @@ namespace atl
 	// These are placeholders. Currently they just static cast.
 	// What contract do these enforce?
 	//
+	// Currently thinking: Allow compile time decision about doing bounds checking
 
 	template <typename naked_type>
 	constexpr float default_int_to_float(const naked_type & value)
@@ -27,7 +29,19 @@ namespace atl
 	{
 		return static_cast<float>(uint32_t{value});
 	}
-	
+
+	template <typename naked_type>
+	constexpr float default_u64_to_float(const naked_type & value)
+	{
+		return static_cast<float>(uint64_t{value});
+	}
+
+	template <typename naked_type>
+	constexpr int default_u64_to_int(const naked_type & value)
+	{
+		return static_cast<int>(uint64_t{value});
+	}
+
 	template <typename naked_type>
 	constexpr int default_double_to_int(const naked_type & value)
 	{
@@ -74,22 +88,49 @@ namespace atl
 	struct safe_comparator_type
 	{
 		wrapped_type value;
-		explicit safe_comparator_type(wrapped_type passthrough_value) : value(passthrough_value) {}
+		constexpr explicit safe_comparator_type(wrapped_type passthrough_value) : value(passthrough_value) {}
 	};
 
 	template <typename wrapped_type>
-	safe_comparator_type<wrapped_type> safe_comparator(const wrapped_type & passthrough_value) { return safe_comparator_type<wrapped_type>(passthrough_value); }
+	constexpr safe_comparator_type<wrapped_type> safe_comparator(const wrapped_type & passthrough_value) { return safe_comparator_type<wrapped_type>(passthrough_value); }
 
-	inline bool operator < (const safe_comparator_type<unsigned> & lhs, const safe_comparator_type<int> & rhs)
+	constexpr bool operator < (const safe_comparator_type<unsigned> & lhs, const safe_comparator_type<int> & rhs)
 	{
 		if(rhs.value < 0)  return false;
 		return lhs.value < static_cast<unsigned>(rhs.value);
 	}
 
-	inline bool operator < (const safe_comparator_type<int> & lhs, const safe_comparator_type<unsigned> & rhs)
+	constexpr bool operator < (const safe_comparator_type<int> & lhs, const safe_comparator_type<unsigned> & rhs)
 	{
 		if(lhs.value < 0) return true;
 		return static_cast<unsigned>(lhs.value) < rhs.value;
 	}
 
+	constexpr bool operator == (const safe_comparator_type<unsigned> & lhs, const safe_comparator_type<int> & rhs)
+	{
+		if(rhs.value < 0)  return false;
+		return lhs.value == static_cast<unsigned>(rhs.value);
+	}
+
+	constexpr bool operator == (const safe_comparator_type<int> & lhs, const safe_comparator_type<unsigned> & rhs)
+	{ 
+		if(lhs.value < 0) return false;
+		return static_cast<unsigned>(lhs.value) == rhs.value;
+	}
+
+	static_assert(safe_comparator((int)-1) < safe_comparator((unsigned)1) == true, "int vs unsigned < (1)");
+	static_assert(safe_comparator((int)1) < safe_comparator((unsigned)1) == false, "int vs unsigned < (2)");
+	static_assert(safe_comparator((int)1) < safe_comparator((unsigned)2) == true, "int vs unsigned < (3)");
+
+	static_assert(safe_comparator((int)-1) == safe_comparator((unsigned)1) == false, "int vs unsigned == (1)");
+	static_assert(safe_comparator((int)1) == safe_comparator((unsigned)2) == false, "int vs unsigned == (2)");
+	static_assert(safe_comparator((int)1) == safe_comparator((unsigned)1) == true, "int vs unsigned == (3)");
+
+	static_assert(safe_comparator((unsigned)1) < safe_comparator((int)-1) == false, "unsigned vs int < (1)");
+	static_assert(safe_comparator((unsigned)1) < safe_comparator((int)1) == false, "unsigned vs int < (2)");
+	static_assert(safe_comparator((unsigned)1) < safe_comparator((int)2) == true, "unsigned vs int < (3)");
+
+	static_assert(safe_comparator((unsigned)1) == safe_comparator((int)-1) == false, "unsigned vs int == (1)");
+	static_assert(safe_comparator((unsigned)2) == safe_comparator((int)1) == false, "unsigned vs int == (2)");
+	static_assert(safe_comparator((unsigned)1) == safe_comparator((int)1) == true, "unsigned vs int == (3)");
 }
