@@ -25,6 +25,8 @@ namespace atl
 		static const float sqrt_2_f = 1.41421356237309504880f;
 		static const float e_f = 2.71828182845904523536f;
 		static const float two_pi_f = 2.f * 3.14159265358979323846f;
+		static const float four_pi_f = 4.f * 3.14159265358979323846f;
+		static const float eight_pi_f = 8.f * 3.14159265358979323846f;
 		static const float pi_f = 3.14159265358979323846f;
 		static const float half_pi_f = 1.57079632679489661923f;
 		static const float quarter_pi_f = 0.785398163397448309616f;
@@ -236,13 +238,21 @@ namespace atl
             return point2f(*this) -= in_otherPt;
         }
         
-		constexpr point2f operator * (float in_scalar) const {
-            return point2f(*this) *= in_scalar;
+		friend constexpr point2f operator * (const point2f & in_point, float in_scalar) {
+            return point2f(in_point) *= in_scalar;
         }
-        
-		constexpr point2f operator / (float in_scalar) const {
-            return point2f(*this) /= in_scalar;
-        }
+
+		friend constexpr point2f operator * (float in_scalar, const point2f & in_point) {
+			return point2f(in_point) *= in_scalar;
+		}
+
+		friend constexpr point2f operator / (const point2f & in_point, float in_scalar) {
+			return point2f(in_point) /= in_scalar;
+		}
+
+		friend constexpr point2f operator / (float in_scalar, const point2f & in_point) {
+			return point2f(in_point) /= in_scalar;
+		}
         
         static point2f get_normal_for_angle(float in_angle) {
             return point2f(cosf(in_angle), sinf(in_angle));
