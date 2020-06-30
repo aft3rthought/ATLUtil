@@ -357,8 +357,16 @@ namespace atl
             return (min + max) * 0.5f;
         }
         
-        float pct(float in_t) const {
+        float value_at_t(float in_t) const {
             return (max - min) * in_t + min;
+        }
+
+        float t_at_value(float in_value) const {
+            return (in_value - min) / (max - min);
+        }
+
+        float pct(float in_t) const {
+            return value_at_t(in_t);
         }
         
         bool contains(float in_value) const {
