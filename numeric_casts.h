@@ -55,6 +55,12 @@ namespace atl
 	}
 
 	template <typename naked_type>
+	constexpr unsigned default_int_to_size_t(const naked_type& value)
+	{
+		return static_cast<size_t>(int{ value });
+	}
+
+	template <typename naked_type>
 	constexpr int default_float_to_int(const naked_type & value)
 	{
 		return static_cast<int>(float{value});
