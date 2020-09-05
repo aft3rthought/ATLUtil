@@ -43,6 +43,12 @@ namespace atl
 	}
 
 	template <typename naked_type>
+	constexpr unsigned default_u64_to_unsigned(const naked_type& value)
+	{
+		return static_cast<unsigned>(uint64_t{value});
+	}
+
+	template <typename naked_type>
 	constexpr int default_double_to_int(const naked_type & value)
 	{
 		return static_cast<int>(double{value});
@@ -55,7 +61,13 @@ namespace atl
 	}
 
 	template <typename naked_type>
-	constexpr unsigned default_int_to_size_t(const naked_type& value)
+	constexpr uint64_t default_int_to_u64(const naked_type& value)
+	{
+		return static_cast<uint64_t>(int{value});
+	}
+
+	template <typename naked_type>
+	constexpr size_t default_int_to_size_t(const naked_type& value)
 	{
 		return static_cast<size_t>(int{ value });
 	}
@@ -70,7 +82,31 @@ namespace atl
 	constexpr long default_float_to_long(const naked_type & value)
 	{
 		return static_cast<long>(float{value});
-	}	
+	}
+
+	template <typename naked_type>
+	constexpr uint64_t default_float_to_u64(const naked_type& value)
+	{
+		return static_cast<uint64_t>(float{value});
+	}
+
+	template <typename naked_type>
+	constexpr float default_size_t_to_float(const naked_type& value)
+	{
+		return static_cast<float>(size_t{value});
+	}
+
+	template <typename naked_type>
+	constexpr uint64_t default_size_t_to_u64(const naked_type& value)
+	{
+		return static_cast<uint64_t>(size_t{value});
+	}
+
+	template <typename naked_type>
+	constexpr int default_size_t_to_int(const naked_type& value)
+	{
+		return static_cast<int>(size_t{value});
+	}
 
 	template <typename naked_type>
 	constexpr unsigned default_float_to_unsigned(const naked_type & value)
@@ -82,6 +118,12 @@ namespace atl
 	constexpr int default_unsigned_to_int(const naked_type & value)
 	{
 		return static_cast<int>(unsigned{value});
+	}
+
+	template <typename naked_type>
+	constexpr char default_unsigned_to_char(const naked_type& value)
+	{
+		return static_cast<char>(unsigned{value});
 	}
 
 	// Safe comparators
