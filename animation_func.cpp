@@ -15,6 +15,21 @@ float atl::ease_in_style2(const float in_val)
     return 1.f - (cos * cos * cos * cos);
 }
 
+float atl::ease_in_sine(const float in_val)
+{
+	return 1.f - std::cosf(in_val * atl::numbers::half_pi_f);
+}
+
+float atl::ease_out_sine(const float in_val)
+{
+	return std::cosf((1.f - in_val) * atl::numbers::half_pi_f);
+}
+
+float atl::ease_in_out_sine(const float in_val)
+{
+	return (std::cosf((1.f + in_val) * atl::numbers::pi_f) + 1.f) / 2.f;
+}
+
 float atl::ease_in_style2_integral(const float in_val)
 {
 	auto sin = std::sinf(atl::numbers::pi_f * in_val);
