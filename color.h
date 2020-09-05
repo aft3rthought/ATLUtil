@@ -107,14 +107,16 @@ namespace atl
             a = in_a;
         }
         
-        bool operator ==(const color & in_otherPoint) {
+        bool operator == (const color & in_otherPoint) const
+        {
             return (r == in_otherPoint.r &&
                     g == in_otherPoint.g &&
                     b == in_otherPoint.b &&
                     a == in_otherPoint.a);
         }
         
-        bool operator !=(const color & in_otherPoint) {
+        bool operator != (const color & in_otherPoint) const
+        {
             return !((*this) == in_otherPoint);
         }
         
