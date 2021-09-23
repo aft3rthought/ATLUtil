@@ -4,14 +4,21 @@
 
 namespace atl
 {
-	/*
-	 integer_divide_rounding_up
-	 Divide value by divisor, rounding up
-	*/
-	template <class T>
-	constexpr T integer_divide_rounding_up(T value, T divisor)
+	// integer_divide_rounding_up
+	// Divide value by divisor, rounding up
+	template <class number_type>
+	constexpr number_type integer_divide_rounding_up(number_type value, number_type divisor)
 	{
 		return (value + divisor - 1) / divisor;
+	}
+
+	// unsigned_subtract_with_floor
+	// Computes a - b, with a minimum value of floor
+	// For protecting against underflows, or for simply enforcing a floor.
+	template <class number_type>
+	constexpr number_type unsigned_subtract_with_floor(number_type a, number_type b, number_type floor)
+	{
+		return (b + floor < a) ? (a - b) : floor;
 	}
 
 	template <class number_type>
@@ -59,7 +66,7 @@ namespace atl
 	template <bool clamp_input, class input_type, class output_type>
 	constexpr linear_transformation_type<clamp_input, input_type, output_type> linear_transformation(input_type i0, input_type i1, output_type o0, output_type o1)
 	{
-		return linear_transformation_type<clamp_input, input_type, output_type>{ numeric_range(i0, i1),extrapolation<input_type>(o0, o1) };
+		return linear_transformation_type<clamp_input, input_type, output_type>{ numeric_range(i0, i1), extrapolation<input_type>(o0, o1) };
 	}
 
 	template <class number_type>
