@@ -19,6 +19,12 @@ namespace atl
 	}
 
 	template <typename naked_type>
+	constexpr double default_int_to_double(const naked_type& value)
+	{
+		return static_cast<double>(int{value});
+	}
+
+	template <typename naked_type>
 	constexpr float default_unsigned_to_float(const naked_type & value)
 	{
 		return static_cast<float>(unsigned{value});
@@ -95,6 +101,12 @@ namespace atl
 	{
 		return static_cast<float>(size_t{value});
 	}
+
+	template <typename naked_type>
+	constexpr double default_size_t_to_double(const naked_type& value)
+	{
+		return static_cast<double>(size_t{value});
+	}	
 
 	template <typename naked_type>
 	constexpr uint64_t default_size_t_to_u64(const naked_type& value)
