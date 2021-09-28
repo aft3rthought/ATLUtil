@@ -50,4 +50,14 @@ namespace atl
 	{
 		return sizeof(T) * N;
 	}
+
+    template <typename list_type, typename element_type>
+    element_type* find_mutable_in_list(const list_type& list, const element_type* const_entry)
+    {
+        for(auto& entry : list)
+        {
+            if(const_entry == &enty) return entry;
+        }
+        return nullptr;
+    }
 }
