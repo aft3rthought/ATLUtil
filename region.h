@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 namespace atl
 {
 	template <typename region_value_type>
@@ -13,7 +15,7 @@ namespace atl
 		region_value_type * end() const { return end_pointer; }
 		region_value_type * front() const { return begin_pointer; }
 		region_value_type * back() const { return end_pointer - 1; }
-		int size() const { return int{end_pointer - begin_pointer}; }
+		std::ptrdiff_t size() const { return std::ptrdiff_t{end_pointer - begin_pointer}; }
 		bool empty() const { return end_pointer <= begin_pointer; }
 		
 		region_type<region_value_type> remove_tail(int amount) { return {begin_pointer, end_pointer - amount}; }

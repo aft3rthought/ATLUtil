@@ -6,6 +6,8 @@
 #include <limits>
 #include <algorithm>
 
+#include "ATLUtil/numeric_casts.h"
+
 namespace atl
 {
     /* 
@@ -209,7 +211,7 @@ namespace atl
      * bit string functions
      */    
     template <typename input_backing_buffer_type, typename output_backing_buffer_type>
-    bool bit_string_copy_bits(bit_string_buffer_wrapper_type<input_backing_buffer_type>& input_buffer, bit_string_buffer_wrapper_type<output_backing_buffer_type>& output_buffer, const size_t total_bits_to_copy)
+    bool bit_string_copy_bits(bit_string_buffer_wrapper_type<input_backing_buffer_type>& input_buffer, bit_string_buffer_wrapper_type<output_backing_buffer_type>& output_buffer, const unsigned total_bits_to_copy)
     {
         auto total_bits_copied = (unsigned)0;
         while(total_bits_copied < total_bits_to_copy)
@@ -272,7 +274,7 @@ namespace atl
     }
 
     template <typename input_backing_buffer_type, typename output_backing_buffer_type>
-    bool bit_string_copy_bytes(bit_string_buffer_wrapper_type<input_backing_buffer_type>& input_buffer, bit_string_buffer_wrapper_type<output_backing_buffer_type>& output_buffer, uint32_t buffer_size_in_bytes)
+    bool bit_string_copy_bytes(bit_string_buffer_wrapper_type<input_backing_buffer_type>& input_buffer, bit_string_buffer_wrapper_type<output_backing_buffer_type>& output_buffer, unsigned buffer_size_in_bytes)
     {
         return bit_string_copy_bits(input_buffer, output_buffer, buffer_size_in_bytes * 8);
     }
@@ -292,7 +294,7 @@ namespace atl
             ptr = begin = in_begin;
             end = begin + in_size;
         }
-        unsigned remaining() const { return std::max(0, end - ptr); }
+        unsigned remaining() const { return std::max(unsigned{0}, atl::default_int_to_unsigned(atl::default_ptrdiff_to_int(end - ptr))); }
         unsigned most_available(unsigned num_bytes) const { return std::min(remaining(), num_bytes); }
         void advance(unsigned num_bytes) { ptr += most_available(num_bytes); }
         backing_buffer_reserve_bytes_result_type reserve_bytes(unsigned num_bytes)
@@ -365,7 +367,7 @@ namespace atl
     }
     
     template <typename integer_type, typename output_backing_buffer_type>
-    bool bit_string_write_chunked_integer(bit_string_buffer_wrapper_type<output_backing_buffer_type>& output_buffer, integer_type value, size_t chunk_size)
+    bool bit_string_write_chunked_integer(bit_string_buffer_wrapper_type<output_backing_buffer_type>& output_buffer, integer_type value, unsigned chunk_size)
     {
         using local_integer_type = typename std::make_unsigned<integer_type>::type;
         constexpr local_integer_type local_integer_size_bits = sizeof(local_integer_type) * 8;
@@ -383,11 +385,11 @@ namespace atl
     }
 
     template <typename integer_type, typename input_backing_buffer_type>
-    bool bit_string_read_chunked_integer(bit_string_buffer_wrapper_type<input_backing_buffer_type>& input_buffer, integer_type& value, size_t chunk_size)
+    bool bit_string_read_chunked_integer(bit_string_buffer_wrapper_type<input_backing_buffer_type>& input_buffer, integer_type& value, unsigned chunk_size)
     {
         integer_type result = 0;
         integer_type chunk;
-        size_t current_bit = 0;
+        unsigned current_bit = 0;
         bool chunk_flag;
         if(!bit_string_read_value(input_buffer, chunk_flag)) return false;
         while(chunk_flag)
