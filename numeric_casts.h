@@ -44,15 +44,39 @@ namespace atl
 	}
 
 	template <typename naked_type>
+	constexpr uint64_t default_i64_to_u64(const naked_type& value)
+	{
+		return static_cast<uint64_t>(int64_t{value});
+	}
+
+	template <typename naked_type>
 	constexpr float default_u64_to_float(const naked_type & value)
 	{
 		return static_cast<float>(uint64_t{value});
 	}
 
 	template <typename naked_type>
+	constexpr int64_t default_u64_to_i64(const naked_type& value)
+	{
+		return static_cast<int64_t>(uint64_t{value});
+	}
+
+	template <typename naked_type>
 	constexpr int default_u64_to_int(const naked_type & value)
 	{
 		return static_cast<int>(uint64_t{value});
+	}
+
+	template <typename naked_type>
+	constexpr uint32_t default_u64_to_u32(const naked_type& value)
+	{
+		return static_cast<uint32_t>(uint64_t{value});
+	}
+
+	template <typename naked_type>
+	constexpr int32_t default_u64_to_i32(const naked_type& value)
+	{
+		return static_cast<int32_t>(uint64_t{value});
 	}
 
 	template <typename naked_type>
@@ -71,6 +95,12 @@ namespace atl
 	constexpr unsigned default_double_to_unsigned(const naked_type& value)
 	{
 		return static_cast<unsigned>(double{value});
+	}
+
+	template <typename naked_type>
+	constexpr float default_double_to_float(const naked_type& value)
+	{
+		return static_cast<float>(double{value});
 	}
 
 	template <typename naked_type>
