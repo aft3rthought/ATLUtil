@@ -52,11 +52,11 @@ namespace atl
 	}
 
     template <typename list_type, typename element_type>
-    element_type* find_mutable_in_list(const list_type& list, const element_type* const_entry)
+    element_type* find_mutable_in_list(list_type& list, const element_type* const_entry)
     {
         for(auto& entry : list)
         {
-            if(const_entry == &enty) return entry;
+            if(const_entry == &entry) return &entry;
         }
         return nullptr;
     }
